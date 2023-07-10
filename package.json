@@ -1,0 +1,15 @@
+{
+  "name": "anonymousity",
+  "version": "1.0.0",
+  "description": "An anonymous app for professionals",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Avninder & Prateek",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "mongoose": "^7.3.2"
+  }
+}
