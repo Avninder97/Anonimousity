@@ -5,7 +5,7 @@
 const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
-    userName: {
+    username: {
         type: String,
         required: true,
         unique: true
@@ -14,14 +14,28 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    role: {
+        type: String,
+        default: "user"
+    },
+    activatingUrlSlug: {
+        type: String,
+    },
+    isActive: {
+        type: Boolean,
+        default: false
+    },
+    isVerified: {
+        type: Boolean,
+        default: false
+    },
     // Required for first verification
     email: {
         type: String,
-        unique: true,
-        required: true
     },
     profile_pic: {
         type: String,
+        default: ''
     },
     // required for password reset as email would be deleted after verification
     private_key: {
@@ -43,9 +57,10 @@ const userSchema = new mongoose.Schema({
     ],
     // To keep track of all the organizations user has worked in
     currentEmployeer: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Organization',
-        default: null
+        // type: mongoose.Schema.Types.ObjectId,
+        // ref: 'Organization',
+        // default: null
+        type: String
     },
     pastEmployeers: [
         {

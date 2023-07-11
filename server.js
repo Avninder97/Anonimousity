@@ -3,7 +3,7 @@
 */
 
 require('dotenv').config()
-console.log(process.env);
+process.env.INDEVMODE && console.log(process.env);
 
 const express = require('express');
 const app = express();
@@ -11,6 +11,7 @@ const DBconnect = require('./utils/database');
 const routes = require('./routes/index');
 
 DBconnect();
+app.use(express.json());
 
 app.use('/api', routes);
 
@@ -22,6 +23,7 @@ app.get('*', (req, res) => {
     })
 });
 
+console.log(`In Developement Mode - ${process.env.INDEVMODE ? "True" : "False"}`);
 
 const port = process.env.PORT || 5000;
 
