@@ -14,7 +14,7 @@ const postControllers = {
 
     },
     deletePost: (req, res) => {
-
+        return res.send("processed");
     },
     likePost: (req, res) => {
 

@@ -1,9 +1,10 @@
 const jwt = require('jsonwebtoken');
 const key = process.env.SECRET_KEY;
 
-module.exports.generateToken = (username, role, picUrl, isVerified) => {
+module.exports.generateToken = (userId, username, role, picUrl, isVerified) => {
     return jwt.sign({
-        username: username,
+        userId,
+        username,
         role,
         profile_pic: picUrl,
         isVerified
