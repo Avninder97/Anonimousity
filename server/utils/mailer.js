@@ -20,6 +20,6 @@ module.exports.generateEmail = (userEmail, link) => {
         console.log('Email sent');
     }).catch((err) => {
         console.log('Email error');
-        console.log(err)
+        console.log(err);
     })
 }

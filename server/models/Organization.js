@@ -5,6 +5,12 @@ const organizationSchema = mongoose.Schema({
         type: String,
         required: true
     },
+    followers: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User'
+        }
+    ],
     currentEmployees: [
         {
             type: mongoose.Schema.Types.ObjectId,
@@ -14,7 +20,7 @@ const organizationSchema = mongoose.Schema({
     pastEmployees: [
         {
             type: mongoose.Schema.Types.ObjectId,
-            ref: 'USer'
+            ref: 'User'
         }
     ]
 },

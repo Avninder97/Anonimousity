@@ -3,15 +3,18 @@
 */
 
 require('dotenv').config()
-process.env.INDEVMODE && console.log(process.env);
+// process.env.INDEVMODE && console.log(process.env);
 
 const express = require('express');
 const app = express();
 const DBconnect = require('./utils/database');
 const routes = require('./routes/index');
+const corsOptions = require('./utils/cors');
+const cors = require('cors')
 
 DBconnect();
 app.use(express.json());
+app.use(cors(corsOptions));
 
 app.use('/api', routes);
 

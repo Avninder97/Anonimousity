@@ -43,6 +43,12 @@ const userSchema = new mongoose.Schema({
         required: true,
         unique: true
     },
+    following: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Organization'
+        }
+    ],
     createdPosts: [
         {
             type: mongoose.Schema.Types.ObjectId,
