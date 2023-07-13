@@ -8,6 +8,10 @@ router
     .get(postControllers.getPosts);
 
 router
+    .route('/new')
+    .post(authMiddlewares.validate, postControllers.createPost);
+
+router
     .route('/:id')
     .get(postControllers.getSinglePost);
 
@@ -24,21 +28,20 @@ router
     .post(authMiddlewares.validate, postControllers.likePost);
 
 // comment routes
-
 router
     .route('/:id/comment/new')
     .post(authMiddlewares.validate, postControllers.addComment);
 
 router
-    .route('/:id/comment/:id/like')
+    .route('/:id/comment/:cId/like')
     .post(authMiddlewares.validate, postControllers.likeComment);
 
 router
-    .route('/:id/comment/:id/delete')
+    .route('/:id/comment/:cId/delete')
     .post(authMiddlewares.authorize, postControllers.deleteComment);
 
 router
-    .route('/:id/comment/:id/edit')
+    .route('/:id/comment/:cId/edit')
     .post(authMiddlewares.authorize, postControllers.editComment);
 
 module.exports = router;
