@@ -30,15 +30,15 @@ router
     .post(authMiddlewares.validate, postControllers.addComment);
 
 router
-    .route('/:id/comment/:id/like')
+    .route('/:id/comment/:cId/like')
     .post(authMiddlewares.validate, postControllers.likeComment);
 
 router
-    .route('/:id/comment/:id/delete')
+    .route('/:id/comment/:cId/delete')
     .post(authMiddlewares.authorize, postControllers.deleteComment);
 
 router
-    .route('/:id/comment/:id/edit')
+    .route('/:id/comment/:cId/edit')
     .post(authMiddlewares.authorize, postControllers.editComment);
 
 module.exports = router;

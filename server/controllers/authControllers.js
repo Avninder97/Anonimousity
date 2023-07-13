@@ -130,7 +130,19 @@ const authControllers = {
                 message: "Server Error"
             })
         }
-        
+    },
+    resetPassword: async (req, res) => {
+        const { username, private_key, newPassword } = req.body;
+        const foundUser = await User.findOne({ username });
+        if(!foundUser || foundUser.private_key != private_key){
+            return res.status(404).json({
+                message: 'Invalid credentials'
+            })
+        }else{
+            // Can't send reset password link :( via mail as it doesn't exist now
+            foundUser.password = newPassword;
+            await foundUser.save();
+        }
     }
 }
 
