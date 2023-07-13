@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const inDev = process.env.INDEVMODE;
 
 module.exports.validate = async (req, res, next) => {
     try {
@@ -10,7 +11,8 @@ module.exports.validate = async (req, res, next) => {
         }
         const token = auth_header.split(' ')[1];
         const decoded = await jwt.verify(token, process.env.SECRET_KEY);
-        console.log(decoded);
+        req.body.decoded = decoded;
+        inDev && console.log(decoded);
         next();
     }catch(err) {
         return res.status(403).json({
@@ -30,8 +32,8 @@ module.exports.authorize = async (req, res, next) => {
         }
         const token = auth_header.split(' ')[1];
         const decoded = await jwt.verify(token, process.env.SECRET_KEY);
-        console.log(decoded);
-    
+        req.body.decoded = decoded;
+        inDev && console.log(decoded);
         /*
             match the decoded token's logged in user id and owner's id
         */

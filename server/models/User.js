@@ -18,6 +18,10 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: "user"
     },
+    gender: {
+        type: String,
+        default: "Choose not to share"
+    },
     activatingUrlSlug: {
         type: String,
     },

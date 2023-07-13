@@ -50,7 +50,7 @@ const authControllers = {
     },
     userRegister: async (req, res) => {
         try {
-            const { username, password, email, profile_pic, currentOrganization } = req.body;
+            const { username, password, email, profile_pic, currentOrganization, gender } = req.body;
 
             if(!(username && password && email)){
                 return res.status(400).json({
@@ -80,12 +80,17 @@ const authControllers = {
                         email, 
                         profile_pic,
                         private_key: key,
-                        currentEmployeer: currentOrganization
+                        currentEmployeer: currentOrganization,
+                        gender
                     });
 
                     let url = `http://localhost:5000/api/auth/${slug}`
-                    generateEmail(email, url);
-
+                    const emailSuccess = generateEmail(email, url);
+                    if(!emailSuccess){
+                        throw "Email error"
+                    }else{
+                        console.log("email not sent");
+                    }
                     return res.status(200).json({
                         message: "Verification email has been sent"
                     });

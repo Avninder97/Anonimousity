@@ -1,4 +1,5 @@
 const mailer = require('nodemailer');
+const inDev = process.env.INDEVMODE;
 
 module.exports.generateEmail = (userEmail, link) => {
     let config = {
@@ -17,9 +18,11 @@ module.exports.generateEmail = (userEmail, link) => {
     let transporter = mailer.createTransport(config);
 
     transporter.sendMail(message).then(() => {
-        console.log('Email sent');
+        inDev && console.log('Email sent');
+        return true;
     }).catch((err) => {
-        console.log('Email error');
-        console.log(err);
+        inDev && console.log('Email error');
+        inDev && console.log(err);
+        return false;
     })
 }

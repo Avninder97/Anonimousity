@@ -8,6 +8,10 @@ router
     .get(postControllers.getPosts);
 
 router
+    .route('/new')
+    .post(authMiddlewares.validate, postControllers.createPost);
+
+router
     .route('/:id')
     .get(postControllers.getSinglePost);
 
@@ -24,7 +28,6 @@ router
     .post(authMiddlewares.validate, postControllers.likePost);
 
 // comment routes
-
 router
     .route('/:id/comment/new')
     .post(authMiddlewares.validate, postControllers.addComment);

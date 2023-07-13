@@ -10,6 +10,10 @@ const commentSchema = mongoose.Schema({
         type: String,
         required: true,
     },
+    linkedToWhichPost: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Post'
+    },
     likedBy: [
         {
             type: mongoose.Schema.Types.ObjectId,
