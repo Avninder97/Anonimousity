@@ -67,10 +67,9 @@ const userSchema = new mongoose.Schema({
     ],
     // To keep track of all the organizations user has worked in
     currentEmployeer: {
-        // type: mongoose.Schema.Types.ObjectId,
-        // ref: 'Organization',
-        // default: null
-        type: String
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Organization',
+        default: null
     },
     pastEmployeers: [
         {
