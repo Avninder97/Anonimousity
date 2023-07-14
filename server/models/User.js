@@ -14,6 +14,8 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+
+    // To distinguish a user from admin
     role: {
         type: String,
         default: "user"
@@ -25,22 +27,29 @@ const userSchema = new mongoose.Schema({
     activatingUrlSlug: {
         type: String,
     },
+
+    // True after the user has gone through verification email
     isActive: {
         type: Boolean,
         default: false
     },
+
+    // True if user gave a work email and the organization has been verified
     isVerified: {
         type: Boolean,
         default: false
     },
-    // Required for first verification
+
+    // Required for first verification, delete after the verification is complete
     email: {
         type: String,
     },
+
     profile_pic: {
         type: String,
         default: ''
     },
+
     // required for password reset as email would be deleted after verification
     private_key: {
         type: String,

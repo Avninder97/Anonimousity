@@ -1,3 +1,6 @@
+/*
+*   This is the post schema for post model in the database
+*/
 const mongoose = require('mongoose');
 
 const postSchema = mongoose.Schema({
@@ -9,7 +12,6 @@ const postSchema = mongoose.Schema({
         type: String,
         required: true
     },
-    // categories will be predefined at front-end
     categories: [
         {
             type: String,

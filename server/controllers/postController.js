@@ -21,12 +21,14 @@ const postControllers = {
     getSinglePost: async (req, res) => {
         try {
             const pid = req.params.id;
-            const foundPost = await Post.findOne({ _id: pid });
+            let foundPost = await Post.findOne({ _id: pid });
             if(!foundPost){
                 return res.status(404).json({
                     message: "Post not found"
                 });
             }
+            await foundPost.populate('comments');
+            await foundPost.populate('likedBy');
             return res.status(200).json({
                 message: "Success",
                 post: foundPost
