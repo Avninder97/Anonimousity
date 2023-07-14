@@ -1,0 +1,166 @@
+<template>
+  <div class="commentBody">
+    <div class="container">
+      <div class="row mb-3">
+        <div class="col-1">
+          <img :src="image(comment_data.image_url)" alt="Hello" />
+        </div>
+        <div class="col-10 heading">
+          <h5>
+            <span class="userName">{{ comment_data.fullName }} </span><br />
+            <span class="orgName">{{ comment_data.organization }}</span>
+          </h5>
+        </div>
+        <div class="col-1"></div>
+      </div>
+      <div class="row mb-2">
+        <div class="col-1"></div>
+        <div class="col-10" v-if="editComment">
+          <textarea
+            ref="editBox"
+            @blur="editCompleted"
+            @input="adaptHeight"
+            class="editArea"
+            v-model="comment_content"
+          />
+        </div>
+        <div class="col-10 comment" v-else>{{ comment_content }}</div>
+        <div class="col-1"></div>
+      </div>
+      <div class="row">
+        <div class="col-1"></div>
+        <div class="col-11 actions">
+          <div class="likezone">
+            <img
+              @click="toggleLike()"
+              v-if="liked"
+              src="../assets/liked.png"
+              alt="liked"
+              class="me-2 ms-2"
+            />
+            <img
+              @click="toggleLike()"
+              v-else
+              src="../assets/like.png"
+              alt="like"
+              class="me-2 ms-2"
+            />
+            <span>{{ likeAmount }}</span>
+          </div>
+
+          <img
+            v-if="editComment"
+            @click="enableEdit"
+            src="../assets/active_edit.png"
+            class="me-2 ms-2"
+          />
+          <img
+            v-else
+            @click="enableEdit"
+            src="../assets/edit.png"
+            class="me-2 ms-2"
+          />
+        </div>
+      </div>
+    </div>
+    <hr style="color: rgb(240, 234, 234)" />
+  </div>
+</template>
+<script>
+export default {
+  data() {
+    return {
+      // Ask for liked status in props object
+      liked: false,
+      editComment: false,
+      comment_content: this.comment_data.comment,
+      likeAmount: this.comment_data.likeAmount,
+    };
+  },
+  props: {
+    comment_data: Object,
+  },
+  
+  methods: {
+    toggleLike() {
+      if (!this.liked) {
+        this.likeAmount++;
+      } else {
+        this.likeAmount--;
+      }
+      // update like values in database
+      this.liked = !this.liked;
+    },
+    image(url) {
+      const path = require(`../assets/${url}`);
+      console.log(path);
+      return path;
+    },
+    enableEdit() {
+      this.editComment = true;
+      setTimeout(() => {
+        this.adaptHeight();
+        this.$refs.editBox.focus();
+      }, 1);
+    },
+    editCompleted() {
+      this.editComment = false;
+      // api to update comment in database
+    },
+    adaptHeight() {
+      const myTextarea = this.$refs.editBox;
+      console.log(myTextarea);
+      myTextarea.style.height = "auto";
+      myTextarea.style.height = myTextarea.scrollHeight + "px";
+    },
+  },
+};
+</script>
+<style>
+.commentBody {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+.container {
+  background-color: rgb(66, 66, 66);
+  /* border-color: rgb(240, 234, 234); */
+  color: rgb(240, 234, 234);
+}
+.editArea {
+  color: rgb(240, 234, 234);
+  width: 100%;
+  height: 100%;
+  border: none;
+  padding: 0.5% 2% 0%;
+  background-color: rgb(66, 66, 66);
+  resize: none;
+}
+.editArea:focus {
+  outline: none;
+}
+.row .col-1 img {
+  width: inherit;
+  min-width: 50px;
+}
+.userName {
+  font-weight: bold;
+}
+.orgName {
+  font-size: medium;
+  font-weight: normal;
+}
+.heading h5 {
+  margin-bottom: 0;
+  /* color: rgb(240, 234, 234); */
+}
+.comment {
+  text-align: justify;
+}
+.likezone {
+  display: flex;
+  align-items: center;
+}
+.actions {
+  display: flex;
+}
+</style>
