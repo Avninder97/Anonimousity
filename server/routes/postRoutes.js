@@ -7,6 +7,7 @@ router
     .route('/')
     .get(postControllers.getPosts);
 
+// Route to create a new post
 router
     .route('/new')
     .post(authMiddlewares.validate, postControllers.createPost);
@@ -15,6 +16,8 @@ router
     .route('/:id')
     .get(postControllers.getSinglePost);
 
+
+// Delete route for a Post
 router
     .route('/:id/delete')
     .post(authMiddlewares.authorize ,postControllers.deletePost);

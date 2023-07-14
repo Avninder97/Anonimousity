@@ -85,9 +85,9 @@ const authControllers = {
                     });
 
                     let url = `http://localhost:5000/api/auth/${slug}`
-                    const emailSuccess = generateEmail(email, url);
+                    const emailSuccess = await generateEmail(email, url);
                     if(!emailSuccess){
-                        throw "Email error"
+                        console.log("Email error");
                     }else{
                         console.log("email not sent");
                     }
@@ -116,6 +116,7 @@ const authControllers = {
                     email: foundUser.email
                 });
             } catch(err) {
+                inDev && console.log(err)
                 return res.status(409).json({
                     message: 'Verification error'
                 })
