@@ -5,6 +5,10 @@ const organizationSchema = mongoose.Schema({
         type: String,
         required: true
     },
+    isVerified: {
+        type: Boolean,
+        default: false
+    },
     followers: [
         {
             type: mongoose.Schema.Types.ObjectId,
@@ -27,3 +31,5 @@ const organizationSchema = mongoose.Schema({
 {
     timestamps: true
 })
+
+module.exports = mongoose.model('Organization', organizationSchema);

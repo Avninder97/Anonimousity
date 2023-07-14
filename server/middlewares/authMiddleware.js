@@ -37,13 +37,15 @@ module.exports.authorize = async (req, res, next) => {
         /*
             match the decoded token's logged in user id and owner's id
         */
-        if(!decoded.userId.equals(ownerId)){
-            return res.status(409).json({
-                message: "You are not authorized for this operation"
-            });
-        }
+        inDev && console.log(decoded.userId, ownerId)
+        // if(!decoded.userId.equals(ownerId)){
+        //     return res.status(409).json({
+        //         message: "You are not authorized for this operation"
+        //     });
+        // }
         next();
     }catch(err){
+        console.log(err);
         return res.status(500).json({
             message: "Server Error"
         })

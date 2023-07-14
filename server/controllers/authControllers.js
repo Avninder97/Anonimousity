@@ -7,6 +7,7 @@ const { generateEmail } = require('../utils/mailer')
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const uuid = require('uuid');
+const Organization = require('../models/Organization');
 
 // To check if server is in development mode
 let inDev = process.env.INDEVMODE;
@@ -65,6 +66,18 @@ const authControllers = {
                 });
             }
 
+            let currOrg = null;
+            if(currentOrganization){
+
+                currOrg = await Organization.findOne({ name: currentOrganization });
+                if(!currOrg){
+                    currOrg = await Organization.create({
+                        name: currentOrganization
+                    })
+                }
+
+            }
+            
             bcrypt.hash(password, 10, async (err, hash) => {
                 if(err){
                     return res.status(500).json({
@@ -73,21 +86,24 @@ const authControllers = {
                 }else{
                     const key = uuid.v4(), slug = uuid.v4();
                     inDev && console.log(key);
-                    await User.create({
+                    const newUser = await User.create({
                         username, 
                         password: hash,
                         activatingUrlSlug: slug,
                         email, 
                         profile_pic,
                         private_key: key,
-                        currentEmployeer: currentOrganization,
+                        currentEmployeer: currOrg._id,
                         gender
                     });
 
+                    currOrg.currentEmployees.push(newUser._id);
+                    await currOrg.save();
+
                     let url = `http://localhost:5000/api/auth/${slug}`
-                    const emailSuccess = generateEmail(email, url);
+                    const emailSuccess = await generateEmail(email, url);
                     if(!emailSuccess){
-                        throw "Email error"
+                        console.log("Email error");
                     }else{
                         console.log("email not sent");
                     }
@@ -116,6 +132,7 @@ const authControllers = {
                     email: foundUser.email
                 });
             } catch(err) {
+                inDev && console.log(err)
                 return res.status(409).json({
                     message: 'Verification error'
                 })
