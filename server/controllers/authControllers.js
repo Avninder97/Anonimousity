@@ -8,6 +8,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const uuid = require('uuid');
 const Organization = require('../models/Organization');
+const { validateWorkMail } = require('../utils/validateWorkMail');
 
 // To check if server is in development mode
 let inDev = process.env.INDEVMODE;
@@ -59,6 +60,13 @@ const authControllers = {
                 })
             }
 
+            const isWorkMail = await validateWorkMail(email);
+            if(!isWorkMail){
+                return res.status(200).json({
+                    message: "Please enter a work email"
+                })
+            }
+
             const alreadyExistEmail = await Email.findOne({ email }), alreadyExistUsername = await User.findOne({ username });
             if(alreadyExistEmail || alreadyExistUsername){
                 return res.status(409).json({
@@ -103,10 +111,12 @@ const authControllers = {
                     let url = `http://localhost:5000/api/auth/${slug}`
                     const emailSuccess = await generateEmail(email, url);
                     if(!emailSuccess){
-                        console.log("Email error");
-                    }else{
-                        console.log("email not sent");
+                        inDev && console.log("Email Not Sent");
+                        return res.status(500).json({
+                            message: "Server Error"
+                        });
                     }
+                    inDev && console.log("Email Sent");
                     return res.status(200).json({
                         message: "Verification email has been sent"
                     });
