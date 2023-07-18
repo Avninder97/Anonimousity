@@ -12,4 +12,14 @@ router
     .route('/new')
     .post(authMiddlewares.validate, orgControllers.addOrganization);
 
+// Fetch a single organization from the DB
+router
+    .route('/:id')
+    .get(orgControllers.getSingleOrganization);
+
+// Let's user follow an organization
+router
+    .route('/:id/follow')
+    .post(authMiddlewares.validate, orgControllers.toggleFollowOrganization);
+
 module.exports = router;

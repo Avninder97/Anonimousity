@@ -13,5 +13,9 @@ router
     .post(authMiddlewares.validate, userControllers.updateEmployeer);
 
 // GET api to regenerate the private-key of a user
+router
+    .route('/profile/regenerateKey')
+    .get(authMiddlewares.validate, userControllers.regenerateKey);
+
 
 module.exports = router;

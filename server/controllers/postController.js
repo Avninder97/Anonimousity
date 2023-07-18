@@ -95,7 +95,8 @@ const postControllers = {
             foundUser.createdPosts.push(newPost._id);
             await foundUser.save();
             return res.status(200).json({
-                message: "Post created successfully"
+                message: "Post created successfully",
+                data: newPost
             });
         } catch(err) {
             inDev && console.log(err);
@@ -145,7 +146,8 @@ const postControllers = {
             await foundPost.save();
             
             return res.status(200).json({
-                message: "Post edited successfully"
+                message: "Post edited successfully",
+                data: foundPost
             });
         } catch(err) {
             console.log(err);
@@ -227,7 +229,8 @@ const postControllers = {
             await foundUser.save();
             
             return res.status(200).json({
-                message: "success"
+                message: "success",
+                likeCount: foundPost.likedBy.length
             });
         } catch(err) {
             console.log(err);
@@ -288,7 +291,8 @@ const postControllers = {
 
             await foundComment.save();
             return res.status(200).json({
-                message: 'success'
+                message: 'success',
+                likeCount: foundComment.likedBy.length
             });
         } catch(err) {
             return res.status(500).json({
@@ -310,7 +314,8 @@ const postControllers = {
             foundComment.description = description;
             await foundComment.save();
             return res.status(200).json({
-                message: 'Success'
+                message: 'Success',
+                data: foundComment
             })
 
         } catch(err) {
