@@ -1,3 +1,6 @@
+/*
+*   This is the organization schema for organization model in the database
+*/
 const mongoose = require('mongoose');
 
 const organizationSchema = mongoose.Schema({

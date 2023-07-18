@@ -1,5 +1,6 @@
 const Organization = require('../models/Organization');
 const User = require('../models/User');
+const uuid = require('uuid');
 let inDev = process.env.INDEVMODE;
 
 const userControllers = {
@@ -82,6 +83,27 @@ const userControllers = {
             });
         } catch(err) {
             inDev && console.log(err);
+            return res.status(500).json({
+                message: "Server Error"
+            })
+        }
+    },
+    regenerateKey: async (req, res) => {
+        try {
+            const id = req.body.decoded.userId;
+            const foundUser = await User.findOne({ _id: id });
+            if(!foundUser){
+                return res.status(404).json({
+                    message: "User not found"
+                })
+            }
+            foundUser.private_key = uuid.v4();
+            await foundUser.save();
+            return res.status(200).json({
+                message: "User updated successfully",
+                private_Key: foundUser.private_key      // might have to make it more secure
+            });
+        } catch(err) {
             return res.status(500).json({
                 message: "Server Error"
             })

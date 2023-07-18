@@ -1,18 +1,22 @@
 const router = require('express').Router();
-const Post = require('../models/Post');
-
-const User = require('../models/User');
 
 const authControllers = require('../controllers/authControllers');
 
 
 router
-    .post('/login', authControllers.userLogin);
+    .route('/login')
+    .post(authControllers.userLogin);
 
 router
-    .post('/register', authControllers.userRegister);
+    .route('/register')
+    .post(authControllers.userRegister);
 
 router
-    .get('/:uniqueSlug', authControllers.userActivation);
+    .route('/usernameCheck')
+    .post(authControllers.usernameCheck);
+
+router
+    .route('/:uniqueSlug')
+    .get(authControllers.userActivation);
 
 module.exports = router;
