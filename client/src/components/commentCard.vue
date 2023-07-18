@@ -1,5 +1,5 @@
 <template>
-  <div class="commentBody">
+  <div>
     <div class="container">
       <div class="row mb-3">
         <div class="col-1">
@@ -15,16 +15,16 @@
       </div>
       <div class="row mb-2">
         <div class="col-1"></div>
-        <div class="col-10" v-if="editComment">
+        <div class="col-10" v-if="editContent">
           <textarea
             ref="editBox"
             @blur="editCompleted"
             @input="adaptHeight"
             class="editArea"
-            v-model="comment_content"
+            v-model="content"
           />
         </div>
-        <div class="col-10 comment" v-else>{{ comment_content }}</div>
+        <div class="col-10 comment" v-else>{{ content }}</div>
         <div class="col-1"></div>
       </div>
       <div class="row">
@@ -49,7 +49,7 @@
           </div>
 
           <img
-            v-if="editComment"
+            v-if="editContent"
             @click="enableEdit"
             src="../assets/active_edit.png"
             class="me-2 ms-2"
@@ -72,8 +72,8 @@ export default {
     return {
       // Ask for liked status in props object
       liked: false,
-      editComment: false,
-      comment_content: this.comment_data.comment,
+      editContent: false,
+      content: this.comment_data.comment,
       likeAmount: this.comment_data.likeAmount,
     };
   },
@@ -82,6 +82,11 @@ export default {
   },
   
   methods: {
+    image(url) {
+      const path = require(`../assets/${url}`);
+      // console.log(path);
+      return path;
+    },
     toggleLike() {
       if (!this.liked) {
         this.likeAmount++;
@@ -91,25 +96,21 @@ export default {
       // update like values in database
       this.liked = !this.liked;
     },
-    image(url) {
-      const path = require(`../assets/${url}`);
-      console.log(path);
-      return path;
-    },
+    
     enableEdit() {
-      this.editComment = true;
+      this.editContent = true;
       setTimeout(() => {
         this.adaptHeight();
         this.$refs.editBox.focus();
       }, 1);
     },
     editCompleted() {
-      this.editComment = false;
+      this.editContent = false;
       // api to update comment in database
     },
     adaptHeight() {
       const myTextarea = this.$refs.editBox;
-      console.log(myTextarea);
+      // console.log(myTextarea);
       myTextarea.style.height = "auto";
       myTextarea.style.height = myTextarea.scrollHeight + "px";
     },
@@ -117,13 +118,12 @@ export default {
 };
 </script>
 <style>
-.commentBody {
+/* .commentBody {
   max-width: 1000px;
   margin: 0 auto;
-}
+} */
 .container {
   background-color: rgb(66, 66, 66);
-  /* border-color: rgb(240, 234, 234); */
   color: rgb(240, 234, 234);
 }
 .editArea {
@@ -142,6 +142,9 @@ export default {
   width: inherit;
   min-width: 50px;
 }
+.heading h5 {
+  margin-bottom: 0;
+}
 .userName {
   font-weight: bold;
 }
@@ -149,10 +152,7 @@ export default {
   font-size: medium;
   font-weight: normal;
 }
-.heading h5 {
-  margin-bottom: 0;
-  /* color: rgb(240, 234, 234); */
-}
+
 .comment {
   text-align: justify;
 }
