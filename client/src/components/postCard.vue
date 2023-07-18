@@ -1,7 +1,7 @@
 <template>
   <!-- <div class="postbody"> -->
     <div class="container">
-      <div class="row mb-3">
+      <div class="row mb-3 pb-1" style="border-bottom: 1px dotted rgb(240,234,234, 0.5);">
         <div class="col-1">
           <img :src="image(postDetail.image_url)" alt="Hello" />
         </div>
@@ -13,7 +13,7 @@
           </h5>
         </div>
       </div>
-      <hr />
+      <!-- <hr /> -->
       <div class="row mb-2">
         <div class="col-1"></div>
         <div class="col-10" v-if="editContent">
@@ -33,10 +33,10 @@
           />
         </div>
         <div class="col-10" v-else>
-          <!-- <h5> -->
+          <p style="text-align: justify;">
             <span class="postTitle">{{ title }} </span><br />
             <span class="postContent">{{ content }}</span>
-          <!-- </h5> -->
+          </p>
         </div>
       </div>
       <!--  -->

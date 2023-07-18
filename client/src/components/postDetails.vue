@@ -68,22 +68,20 @@ export default {
 .input-group-text {
   height: 30px;
   border: none;
-  border-bottom: 1px solid white;
-  outline: brown;
-  color: white;
+  border-bottom: 1px solid rgb(240, 234, 234);
+  outline: none;
+  border-radius: 0;
+  color: rgb(240, 234, 234);
   background-color: rgb(66, 66, 66);
 }
 .inputControl::placeholder {
   color: rgb(240, 234, 234);
 }
-.inputControl:focus {
-  border-color: none;
-  border-bottom: 1px solid white;
-  background-color: rgb(66, 66, 66);
-  color: rgb(240, 234, 234);
-}
+
 .arrow {
   font-weight: bold;
+  user-select: none;
   cursor: pointer;
 }
+
 </style>
