@@ -236,6 +236,24 @@ const authControllers = {
                 message: "Server Error"
             });
         }
+    },
+    usernameCheck: async (req, res) => {
+        try {
+            const { username } = req.body;
+            const foundUser = await User.findOne({ username });
+            if(foundUser){
+                return res.status(409).json({
+                    message: "Username not avaliable"
+                });
+            }
+            return res.status(200).json({
+                message: "Username avaliable"
+            });
+        } catch(err) {
+            return res.status(500).json({
+                message: "Server Error"
+            })
+        }
     }
 }
 
