@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const authMiddlewares = require('../middlewares/authMiddleware')
+const authMiddlewares = require('../middlewares/authMiddlewares')
 const postControllers = require('../controllers/postController');
 
 // Route to fetch all posts

@@ -20,7 +20,7 @@ module.exports.generateEmail = async (userEmail, link) => {
             html: `<a>${link}</a>`
         }
         let transporter = mailer.createTransport(config);
-
+        inDev && console.log("Email - ", userEmail);
         const res = await transporter.sendMail(message);
         inDev && console.log(res);
         return true;

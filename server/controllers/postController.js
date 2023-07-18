@@ -5,6 +5,8 @@ const Organization = require('../models/Organization');
 const inDev = process.env.INDEVMODE;
 
 const postControllers = {
+
+    // Fetches all the posts from the database
     getPosts: async (req, res) => {
         try {
             const posts = await Post.find({});
@@ -18,6 +20,8 @@ const postControllers = {
             });
         }
     },
+
+    // Fetches a single post and populate it's references for likedBy & comments
     getSinglePost: async (req, res) => {
         try {
             const pid = req.params.id;
@@ -44,45 +48,72 @@ const postControllers = {
     /* 
         This controller is responsible for creating the post
         and pushing it's ID to author's created Posts ref array 
+        and also it can handle the organization linkage to the post
+        even if that specific organization is not present in db
+
+        Complete
     */
     createPost: async (req, res) => {
         try {
-            const { title, description, backgroundImage, categories, decoded } = req.body;
+            let { title, description, backgroundImage, categories, decoded, organizationName } = req.body;
             if(!(title && description && decoded)){
                 return res.status(400).json({
                     message: "Fill All necessary fields"
                 })
             }
             const userId = decoded.userId;
+            const foundUser = await User.findOne({ _id: userId });
+            
+            if(!foundUser){
+                return res.status(403).json({
+                    message: "Please login"
+                });
+            }
+            
+            // create or find the organization
+            let foundOrganization = null;
+            if(organizationName){
+                organizationName = organizationName.toLowerCase();
+                foundOrganization = await Organization.findOne({ name: organizationName });
+                if(!foundOrganization){
+                    foundOrganization = await Organization.create({
+                        name: organizationName,
+                    });
+                }
+                // Now found organization is present if organization Name is given
+            }
+
             const newPost = await Post.create({
                 title,
                 description,
                 backgroundImage,
                 categories,
-                author: userId
-            })
-            const foundUser = await User.findOne({ _id: userId });
-            if(!foundUser){
-                await Post.deleteOne({ _id: newPost._id });
-                return res.status(403).json({
-                    message: "Please login"
-                });
-            }
+                author: userId,
+                organization: organizationName ? foundOrganization._id : null
+            });
+
             foundUser.createdPosts.push(newPost._id);
             await foundUser.save();
             return res.status(200).json({
                 message: "Post created successfully"
-            })
+            });
         } catch(err) {
-            console.log(err);
+            inDev && console.log(err);
             return res.status(500).json({
                 message: "Server Error"
             });
         }
     },
+
+    /*
+        This controller is responsible for editing an existing post
+        in the database and also creating a new unverified organization in db if necessary
+        
+        Complete
+    */
     editPost: async (req, res) => {
         try {
-            const { decoded, title, description, categories, backgroundImage, organization } = req.body, { id } = req.params;
+            const { decoded, title, description, categories, backgroundImage, organizationName } = req.body, { id } = req.params;
             if(!(title && description && decoded)){
                 return res.status(400).json({
                     message: "Fill All necessary fields"
@@ -101,14 +132,14 @@ const postControllers = {
             foundPost.categories = categories;
             foundPost.backgroundImage = backgroundImage;
 
-            if(organization){
-                const foundOrganization = await organization.findOne({name: organization});
+            if(organizationName){
+                const foundOrganization = await organization.findOne({name: organizationName});
                 if(!foundOrganization){
                     foundOrganization = await Organization.create({
-                        name: organization
+                        name: organizationName
                     });
                 }
-                foundPost.organization = foundOrganization;
+                foundPost.organization = foundOrganization._id;
             }
 
             await foundPost.save();
@@ -165,13 +196,17 @@ const postControllers = {
         }
     },
 
-    // Manages the likes of  post by toggling them and also updating is user ref id array
+    /* 
+        Manages the likes of post by toggling them and also updating is user ref id array
+        Complete
+    */
     likePost: async (req, res) => {
         try {
             const { decoded } = req.body, { id } = req.params;
             const userId = decoded.userId;
             const foundPost = await Post.findOne({ _id: id });
             const foundUser = await User.findOne({ _id: userId });
+
             if(!foundPost || !foundUser){
                 return res.status(404).json({
                     message: `${ foundPost ? 'User' : 'Post' } not found`
@@ -201,11 +236,14 @@ const postControllers = {
             });
         }
     },
+
+    // Complete
     addComment: async (req, res) => {
         try {
             const { id } = req.params, author = req.body.decoded.userId;
             const { description } = req.body;
             const foundPost = await Post.findOne({ _id: id });
+
             if(!foundPost){
                 return res.status(404).json({
                     message: 'Invalid Post'
@@ -224,10 +262,12 @@ const postControllers = {
         } catch(err) {
             console.log(err)
             return res.status(500).json({
-                message: "Server Errora"
+                message: "Server Error"
             });
         }
     },
+
+    // Complete
     likeComment: async (req, res) => {
         try {
             const { cId } = req.params, likedById = req.body.decoded.userId;
@@ -256,6 +296,8 @@ const postControllers = {
             });
         }
     },
+
+
     editComment: async (req, res) => {
         try {
             const { id, cId } = req.params, currUserId = req.body.decoded.userId, { description } = req.body;
@@ -278,6 +320,8 @@ const postControllers = {
             });
         }
     },
+
+    // Complete
     deleteComment: async (req, res) => {
         try {
             const { id, cId } = req.params, currUserId = req.body.decoded.userId;
@@ -296,7 +340,7 @@ const postControllers = {
         } catch(err) {
             console.log(err);
             return res.status(500).json({
-                message: "Server Errordel"
+                message: "Server Error"
             });
         }
     }
