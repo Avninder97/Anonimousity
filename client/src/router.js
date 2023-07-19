@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from "vue-router"
 import profilePage from './components/profilePage'
 import feedPage from './components/feedPage'
 import postDetails from './components/postDetails'
+import accountActivation from './components/accountActivation'
 
 const routes = [
     {
@@ -16,8 +17,14 @@ const routes = [
     },
     {
         name: "postDetails",
-        path: '/post',
+        path: '/posts',
         component: postDetails
+    },
+    {
+        name: "accountActivation",
+        path: '/account/activation/:slug',
+        component: accountActivation,
+        props: true
     }
 ]
 

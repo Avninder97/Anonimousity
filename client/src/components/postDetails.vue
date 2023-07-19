@@ -51,11 +51,11 @@ export default {
   max-width: 1000px;
   margin: 0 auto;
 }
-.sepForComms {
+/* .sepForComms {
   border: none;
   border-bottom: 1.5px solid rgb(240, 234, 234);
   border-radius: 0px 0px 3% 3%;
-}
+} */
 .addComments {
   display: flex;
   align-items: center;

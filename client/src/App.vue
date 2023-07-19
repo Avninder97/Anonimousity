@@ -1,7 +1,9 @@
 <template>
   <div>
     <navBar />
-    <router-view />
+    <div id="body-wrapper">
+      <router-view />
+    </div>
   </div>
 </template>
 
@@ -23,6 +25,10 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   /* text-align: center; */
   color: #2c3e50;
+}
+#body-wrapper {
+  margin-top: 56px;
+  padding: 30px;
 }
 img{
   user-select: none;
