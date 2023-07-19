@@ -47,16 +47,18 @@
             <img
               @click="toggleLike()"
               v-if="liked"
-              src="../assets/liked.png"
+              src="../assets/liked_design.png"
               alt=" "
-              class="me-2 ms-2"
+              width="24"
+              class="mx-2"
             />
             <img
               @click="toggleLike()"
               v-else
-              src="../assets/like.png"
+              src="../assets/design.png"
+              width="24"
               alt="like"
-              class="me-2 ms-2"
+              class="mx-2"
             />
             <span class="me-2">{{ likeAmount }}</span>
           </div>
@@ -64,14 +66,16 @@
             <img
             v-if="editContent"
             @click="enableEdit"
-            src="../assets/active_edit.png"
-            class="me-2 ms-2"
+            src="../assets/editing_design.png"
+            width="24"
+            class="mx-2"
           />
           <img
             v-else
             @click="enableEdit"
-            src="../assets/edit.png"
-            class="me-2 ms-2"
+            width="24"
+            src="../assets/edit_design.png"
+            class="mx-2"
           />
           </div>
           
@@ -127,7 +131,7 @@ export default {
       setTimeout(() => {
         this.adaptHeight();
         this.$refs.editBox.focus();
-      }, 1);
+      }, 0.5);
     },
 
     editCompleted(fromLoc) {
@@ -175,13 +179,12 @@ export default {
 
 .editArea {
   color: rgb(240, 234, 234);
-  width: 100%;
-  height: 100%;
   border: none;
-  padding: 0.5% 2% 0%;
+  padding: 0px;
   background-color: rgb(66, 66, 66);
   resize: none;
   font-size: medium;
+  text-align: justify;
 }
 .heading h5 {
   margin-bottom: 0;
@@ -198,12 +201,18 @@ export default {
   font-weight: bold;
 }
 .postContent {
-  font-size: large;
+  font-size: medium;
   /* color: red; */
   text-align: justify;
 }
 .actions{
   display: flex-end;
   align-items: flex-end
+}
+.likeButton{
+  display: flex;
+  justify-content: baseline;
+  font-weight: bold;
+  /* align-items: center; */
 }
 </style>

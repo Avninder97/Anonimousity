@@ -1,5 +1,5 @@
 <template>
-  <nav class="navbar navbar-light bg-light">
+  <nav class="navbar ourNav">
     <div class="container-fluid">
       <span class="navbar-brand" @click="openFeeds">Anonymousity</span>
 
@@ -52,5 +52,8 @@ export default {
 }
 .navbar-brand {
   cursor: pointer;
+}
+.ourNav{
+  background-color: white;
 }
 </style>
