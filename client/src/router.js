@@ -18,7 +18,7 @@ const routes = [
     },
     {
         name: "postDetails",
-        path: '/posts',
+        path: '/post',
         component: postDetails
     },
     {   name: "loginPage",
