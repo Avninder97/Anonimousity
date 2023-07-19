@@ -30,36 +30,41 @@
       <div class="row">
         <div class="col-1"></div>
         <div class="col-11 actions">
-          <div class="likezone">
+          <div class="likeButton">
             <img
               @click="toggleLike()"
               v-if="liked"
-              src="../assets/liked.png"
-              alt="liked"
-              class="me-2 ms-2"
+              src="../assets/liked_design.png"
+              alt=" "
+              width="24"
+              class="mx-2"
             />
             <img
               @click="toggleLike()"
               v-else
-              src="../assets/like.png"
+              src="../assets/design.png"
+              width="24"
               alt="like"
-              class="me-2 ms-2"
+              class="mx-2"
             />
-            <span>{{ likeAmount }}</span>
+            <span class="me-2">{{ likeAmount }}</span>
           </div>
-
-          <img
+          <div class="editButton">
+            <img
             v-if="editContent"
             @click="enableEdit"
-            src="../assets/active_edit.png"
-            class="me-2 ms-2"
+            src="../assets/editing_design.png"
+            width="24"
+            class="mx-2"
           />
           <img
             v-else
             @click="enableEdit"
-            src="../assets/edit.png"
-            class="me-2 ms-2"
+            width="24"
+            src="../assets/edit_design.png"
+            class="mx-2"
           />
+          </div>
         </div>
       </div>
     </div>
@@ -156,10 +161,7 @@ export default {
 .comment {
   text-align: justify;
 }
-.likezone {
-  display: flex;
-  align-items: center;
-}
+
 .actions {
   display: flex;
 }

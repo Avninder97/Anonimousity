@@ -65,11 +65,11 @@
          -->
         <div class="genderClass">
           <div class="genOne">
-            <input type="radio" name="gender" value="male" />
+            <input type="radio" name="gender" value="male" v-model="signUpData.gender"/>
             <span class="ms-2">Male</span>
           </div>
           <div class="genOne">
-            <input type="radio" name="gender" value="female" />
+            <input type="radio" name="gender" value="female" v-model="signUpData.gender"/>
             <span class="ms-2">Female</span>
           </div>
         </div>

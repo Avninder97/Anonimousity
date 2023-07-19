@@ -1,6 +1,6 @@
 <template>
   <div class="feedBody">
-    <postCard class="card my-2 py-2">
+    <postCard class="card py-2">
       <div class="input-group addComments ms-2">
         <input type="text" placeholder="Add a Comment" class="inputControl" v-model="newComment"/>
         <span @click="addComment" class="input-group-text arrow" ref="commentArrow">>></span>
@@ -40,13 +40,12 @@ export default {
 .feedBody {
   max-width: 1000px;
   margin: 0 auto;
+  margin-top: 2px;
 }
 .card{
-  /* border: 1px solid rgb(234, 240, 240); */
-  border: none;
-  border-radius: 13px;
-  box-shadow: 0px 0px 38px -19px rgba(234,240,240,0.2);
-  border-top: 1px solid rgb(240, 234,234,0.3);
+  border: 1px solid rgb(240, 234,234,0.3);
+  border-radius: 0px;
+  /* border-bottom: none; */
   
 }
 </style>
