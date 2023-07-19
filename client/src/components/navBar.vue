@@ -1,7 +1,7 @@
 <template>
-  <nav class="navbar ourNav">
+  <nav class="navbar navbar-light ourNavbar fixed-top">
     <div class="container-fluid">
-      <span class="navbar-brand" @click="openFeeds">Anonymousity</span>
+      <span class="navbar-brand text-light" @click="openFeeds">Anonymousity</span>
 
       <div v-if="this.$store.state.loggedIn" class="mx-2">
         <img
@@ -47,6 +47,9 @@ export default {
 };
 </script>
 <style>
+.ourNavbar {
+  background-color: rgb(47, 17, 98);
+}
 .dropdown-item {
   cursor: pointer;
 }

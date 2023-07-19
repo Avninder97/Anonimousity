@@ -144,6 +144,12 @@ const authControllers = {
         try {
             const slug = req.params.uniqueSlug;
             const foundUser = await User.findOne({activatingUrlSlug: slug});
+            
+            if(!foundUser || foundUser.isActive){
+                return res.status(403).json({
+                    message: "Invalid Activation Link"
+                });
+            }
 
             let eDomain = foundUser.email.split('@')[1];
             let orgName = eDomain.split('.')[0];
@@ -153,11 +159,6 @@ const authControllers = {
             const foundOrganization = await Organization.findOne({ name: orgName });
             const foundDomain = await Domain.findOne({ domain: eDomain });
 
-            if(!foundUser || foundUser.isActive){
-                return res.status(403).json({
-                    message: "Invalid Activation Link"
-                });
-            }
 
             try {
                 await Email.create({

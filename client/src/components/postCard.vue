@@ -1,12 +1,12 @@
 <template>
   <!-- <div class="postbody"> -->
-    <div class="container">
-      <div class="row mb-3 pb-1" style="border-bottom: 1px dotted rgb(240,234,234, 0.5);">
+    <div class="container postcard">
+      <div class="row postHead mb-3 pb-1" style="border-bottom: 1px dotted rgb(240,234,234, 0.5);">
         <div class="col-1">
           <img :src="image(postDetail.image_url)" alt="Hello" />
         </div>
 
-        <div class="col-10 heading">
+        <div class="col-10 heading p-0">
           <h5>
             <span class="userName">{{ postDetail.postMaker }} </span><br />
             <span class="orgName">{{ postDetail.postOrg }}</span>
@@ -166,6 +166,13 @@ export default {
 .postbody {
   max-width: 1000px;
   margin: 0 auto;
+}
+.postcard {
+  border-radius: 25px;
+  /* padding: 10px 20px; */
+}
+.postHead {
+  padding: 20px 20px 0px;
 }
 .editTitle {
   padding: 0.5% 2% 0%;

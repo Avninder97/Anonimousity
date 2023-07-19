@@ -88,6 +88,8 @@ const userControllers = {
             })
         }
     },
+
+    // Used to regenerate private_key for the logged in user
     regenerateKey: async (req, res) => {
         try {
             const id = req.body.decoded.userId;
