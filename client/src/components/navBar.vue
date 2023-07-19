@@ -3,7 +3,7 @@
     <div class="container-fluid">
       <span class="navbar-brand text-light" @click="openFeeds">Anonymousity</span>
 
-      <div v-if="token" class="btn-group">
+      <div v-if="this.$store.state.loggedIn" class="mx-2">
         <img
           src="../assets/b1.png"
           class="navbar-logo"
@@ -15,10 +15,14 @@
         <ul class="dropdown-menu dropdown-menu-end">
           <li class="dropdown-item" @click="openProfile">Profile</li>
           <li><hr class="dropdown-divider" /></li>
-          <li class="dropdown-item">Log Out</li>
+          <li class="dropdown-item" @click="changeLog">Log Out</li>
         </ul>
       </div>
-      <button v-else class="btn btn-outline-success">Login / Sign Up</button>
+      <div v-else>
+        <button class="btn btn-outline-success mx-2" @click="changeLog">
+          Login/ SignUp
+        </button>
+      </div>
     </div>
   </nav>
 </template>
@@ -26,9 +30,7 @@
 export default {
   name: "navBar",
   data() {
-    return {
-      token: true,
-    };
+    return {};
   },
   methods: {
     openProfile() {
@@ -36,6 +38,10 @@ export default {
     },
     openFeeds() {
       this.$router.push({ name: "feedPage" });
+    },
+    changeLog() {
+      // this.$store.commit("changeLog");
+      this.$router.push({name: 'loginPage'})
     },
   },
 };
@@ -47,7 +53,7 @@ export default {
 .dropdown-item {
   cursor: pointer;
 }
-.navbar-brand{
+.navbar-brand {
   cursor: pointer;
 }
 </style>

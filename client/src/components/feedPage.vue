@@ -1,15 +1,52 @@
 <template>
   <div class="feedBody">
-    <p style="color: white">This is the landing feed page</p>
+    <postCard class="card my-2 py-2">
+      <div class="input-group addComments ms-2">
+        <input type="text" placeholder="Add a Comment" class="inputControl" v-model="newComment"/>
+        <span @click="addComment" class="input-group-text arrow" ref="commentArrow">>></span>
+      </div>
+    </postCard>
+    <postCard class="card my-2 py-2"></postCard>
+    <postCard class="card my-2 py-2"></postCard>
+    <postCard class="card my-2 py-2"></postCard>
+    <postCard class="card my-2 py-2"></postCard>
   </div>
 </template>
 <script>
-export default {};
+import postCard from './postCard.vue';
+export default {
+  data(){
+    return{
+      newComment: ''
+    }
+  },
+  components:{
+    postCard,
+  },
+  methods:{
+    addComment() {
+      if(this.newComment)
+      {const arrow = this.$refs.commentArrow;
+      arrow.style.color = 'green'
+      setTimeout(()=>{
+        arrow.style.color = 'rgb(240, 234, 234)'
+      },500)
+      this.newComment = ''}
+    },
+  }
+};
 </script>
 <style>
 .feedBody {
   max-width: 1000px;
-  background-color: red;
   margin: 0 auto;
+}
+.card{
+  /* border: 1px solid rgb(234, 240, 240); */
+  border: none;
+  border-radius: 13px;
+  box-shadow: 0px 0px 38px -19px rgba(234,240,240,0.2);
+  border-top: 1px solid rgb(240, 234,234,0.3);
+  
 }
 </style>
