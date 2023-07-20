@@ -1,8 +1,9 @@
 <template>
   <div>
     <navBar />
+    
     <div id="body-wrapper">
-      <router-view />
+      <router-view/>  
     </div>
   </div>
 </template>
@@ -28,9 +29,11 @@ export default {
 }
 #body-wrapper {
   margin-top: 56px;
-  padding: 30px;
 }
 img{
+  user-select: none;
+}
+input::placeholder{
   user-select: none;
 }
 </style>
