@@ -7,7 +7,12 @@
       </div>
     </postCard>
     <!-- Put a v-for loop for comments gathered from database -->
-    <commentCard :comment_data="commentObject" />
+    <div class="commentArea">
+      <commentCard :comment_data="commentObject" />
+      <commentCard :comment_data="commentObject" />
+      <commentCard :comment_data="commentObject" />
+    </div>
+    
   </div>
 </template>
 <script>
@@ -83,5 +88,8 @@ export default {
   user-select: none;
   cursor: pointer;
 }
-
+/* .postPage .commentArea{
+  overflow: auto;
+  height: 400px;
+} */
 </style>

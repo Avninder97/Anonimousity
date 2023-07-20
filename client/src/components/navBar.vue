@@ -56,4 +56,7 @@ export default {
 .navbar-brand {
   cursor: pointer;
 }
+.ourNav{
+  background-color: white;
+}
 </style>
