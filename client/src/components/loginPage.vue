@@ -26,13 +26,17 @@
       <button
         class="mx-2"
         style="border: 1px solid rgb(255, 255, 255, 0.5)"
-        @click="this.$router.back()"
+        @click="backFromAvatarPage"
       >
-        Skip
+        Back
       </button>
-      <button class="mx-2" style="border: 1px solid rgb(255, 255, 255, 0.5)">
-        Update
+      <button class="mx-2" style="border: 1px solid rgb(255, 255, 255, 0.5)" @click="signUpSubmit">
+        Sign Up
       </button>
+    </div>
+    <div>
+      <p v-if="verificationMsg">{{ verificationMsgContent }}</p>
+      <p v-else-if="registerError">{{ registerErrorMessage }}</p>
     </div>
   </div>
   <div v-else class="container login" ref="container">
@@ -43,7 +47,16 @@
           type="text"
           placeholder="Username"
           v-model.lazy="signUpData.username"
+          ref="registerUsername"
         />
+        <div v-if="showUsernameMsg" class="rUsernameErrorMsgHolder">
+          <p v-if="duplicateUsername" style="color: red" class="m-0">
+            Username is not avaliable
+          </p>
+          <p v-else style="color: green" class="m-0">
+            Username is avaliable
+          </p>
+        </div>
         <input type="email" placeholder="Email" v-model="signUpData.email" />
         <input
           type="password"
@@ -74,7 +87,7 @@
           </div>
         </div>
 
-        <button @click="selectAvatar">Sign Up</button>
+        <button @click="selectAvatar">Next</button>
       </div>
     </div>
     <div class="form-container sign-in-container">
@@ -83,7 +96,12 @@
         <input type="email" placeholder="Email" v-model="username"/>
         <input type="password" placeholder="Password" v-model="password"/>
         <a href="#">Forgot your password?</a>
-        <button @click="changeLog">Sign In</button>
+        <button @click="signInSubmit">Sign In</button>
+        <div v-if="loginError" class="mt-2 signInErrorMsgHolder">
+          <p class="mt-4 mb-0 text-danger" >
+            {{ loginErrorMessage }}
+          </p>
+        </div>
       </div>
     </div>
     <div class="overlay-container">
@@ -103,6 +121,7 @@
   </div>
 </template>
 <script>
+import axios from 'axios';
 export default {
   name: "loginPage",
   data() {
@@ -120,18 +139,38 @@ export default {
       },
       retyped_password: "",
       avatar_page: false,
+
+      duplicateUsername: false,
+      showUsernameMsg: false,
+      registerError: false,
+      registerErrorMessage: "",
+      verificationMsg: false,
+      verificationMsgContent: "",
+
+      loginError: false,
+      loginErrorMessage: ""
     };
   },
   methods: {
     signUpForm() {
+      console.log(this.$refs.container.classList)
       this.$refs.container.classList.add("right-panel-active");
     },
     signInForm() {
+      console.log(this.$refs.container.classList)
       this.$refs.container.classList.remove("right-panel-active");
     },
     selectAvatar() {
       // forward to avatar selection page
       this.avatar_page = true;
+    },
+    backFromAvatarPage(){
+      this.verificationMsg = false;
+      this.registerError = false;
+      this.verificationMsgContent = "";
+      this.registerErrorMessage = "";
+      this.avatar_page = false;
+      // this.$refs.container.classList.add("right-panel-active");
     },
     image(url) {
       const path = require(`../assets/${url}`);
@@ -140,17 +179,93 @@ export default {
     changeAvatar(url) {
       this.signUpData.profile_pic = url;
     },
-    changeLog() {
+    async signInSubmit() {
       // api for sign in using this.username this.password
-      this.$store.commit("changeLog");
-      this.$router.back();
+      await axios.post('http://localhost:5000/api/auth/login', {
+        username: this.username,
+        password: this.password
+      })
+      .then((data) => {
+        let token = data.data.token;
+        console.log(token);
+        document.cookie = `token=${token}`;
+        this.username = "";
+        this.password = "";
+        this.loginError = false;
+        this.loginErrorMessage = "";
+
+        // jwt payload extraction
+        let payload = token.split('.')[1];
+        payload = payload.replace(/-/g, '+').replace(/_/g, '/');
+        payload = decodeURIComponent(window.atob(payload).split('').map(function(c) {
+          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+        payload = JSON.parse(payload);
+        console.log(payload);
+        
+        this.$store.commit('updateToken', token);
+        this.$store.commit('updateUser', payload);
+        this.$router.push('/');
+      })
+      .catch((err) => {
+        console.log(err);
+        this.username = "";
+        this.password = "";
+        this.loginError = true;
+        this.loginErrorMessage = err.response ? err.response.data.message : "Unknown Error Occured"
+      })
     },
+    async signUpSubmit() {
+      // Calls api for user registration
+      const { username, email, password, gender, profile_pic } = this.signUpData;
+
+      // required fields
+      if(username && email && password){
+        await axios.post('http://localhost:5000/api/auth/register', {
+          username,
+          password,
+          email,
+          profile_pic,
+          gender
+        })
+        .then((response) => {
+          console.log(response);
+          this.verificationMsg = true;
+          this.verificationMsgContent = "Verification Email has been sent to your email address";
+        })
+        .catch((err) => {
+          console.log(err);
+          this.registerError = true;
+          this.registerErrorMessage = "Unknown error occured";
+        })
+      }
+      else{
+        this.registerError = true;
+        this.registerErrorMessage = "Invalid Credentails";
+      }
+    }
   },
   watch: {
-    "signUpData.username"() {
+    async "signUpData.username"() {
       // api call for checking username
-      console.log("check username");
-      console.log(this.signUpData.username);
+      if(!this.signUpData.username){
+        this.$refs.registerUsername.style.outline = "1px solid yellow";
+        this.showUsernameMsg = false;
+      }else{
+        await axios.post('http://localhost:5000/api/auth/usernameCheck', {
+          username: this.signUpData.username
+        }).then((response) => {
+          console.log(response);
+          this.$refs.registerUsername.style.outline = "1px solid green";
+          this.duplicateUsername = false;
+          this.showUsernameMsg = true;
+        }).catch((err) => {
+          console.log(err);
+          this.$refs.registerUsername.style.outline = "1px solid red";
+          this.duplicateUsername = true;
+          this.showUsernameMsg = true;
+        })
+      }
     },
     retyped_password(newValue) {
       if (newValue !== this.signUpData.password) {
@@ -255,6 +370,11 @@ export default {
   max-width: 100%;
   min-height: 480px;
   min-height: 600px;
+}
+
+.signInErrorMsgHolder {
+  position: absolute;
+  bottom: 125px;
 }
 
 .form-container {

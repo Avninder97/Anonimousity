@@ -3,12 +3,19 @@ import { createStore } from 'vuex'
 const store = createStore({
     state(){
         return{
-            loggedIn: false
+            userToken: "",
+            user: null
         }
     },
     mutations: {
-        changeLog(state){
+        changeLoginStatus(state){
             state.loggedIn = !state.loggedIn
+        },
+        updateToken(state, token){
+            state.userToken = token;
+        },
+        updateUser(state, data){
+            state.user = data;
         }
     }
 })
