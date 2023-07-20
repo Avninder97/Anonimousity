@@ -110,7 +110,8 @@ export default {
   user-select: none;
   text-align: center;
   /* text-align: right; */
-  background-color: #818A8F;
+  /* background-color: #818A8F; */
+  background-color: #424242;
   color: rgb(240, 234, 234);
   font-size: x-large;
   border-radius: 30px;
@@ -124,6 +125,7 @@ export default {
 .selectedOption {
   cursor: auto;
   color: inherit;
+  color: #424242;
   background-color: rgb(240,232,232);
   border-radius: 30px 0px 0px 30px;
   margin-right: 0;

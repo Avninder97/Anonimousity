@@ -1,5 +1,5 @@
 <template>
-  <div class="container login avatars" v-if="avatar_page">
+  <div class="container login avatars" v-if="current_body === 'avatar'">
     <div class="selected">
       <img :src="image(signUpData.profile_pic)" alt="" />
       <img
@@ -39,6 +39,28 @@
       <p v-else-if="registerError">{{ registerErrorMessage }}</p>
     </div>
   </div>
+
+  <div
+    class="container login avatars"
+    v-else-if="current_body === 'changePass'"
+  >
+    <div class="form bg-transparent">
+      <h2 class="my-3">Forgot Password</h2>
+      <input
+        type="text"
+        placeholder="Please enter your username"
+        v-model="passForgotData.username"
+      />
+      <input type="text" placeholder="Enter your private key" v-model="passForgotData.privateKey" />
+      <input type="password" placeholder="New Password" v-model="passForgotData.password" />
+      <input type="password" ref="passChangeRetype" placeholder="Confirm new Password" v-model="passForgotData.confirmPassword"/>
+      <div class="select">
+        <button class="m-2 button-2" @click="current_body = ''">Go Back</button>
+        <button class="m-2 button-2" @click="forgotPassword()">Update</button>
+      </div>
+    </div>
+  </div>
+
   <div v-else class="container login" ref="container">
     <div class="form-container sign-up-container">
       <div class="form">
@@ -74,15 +96,23 @@
           placeholder="Organization"
           v-model="signUpData.organization"
         />
-        <!-- <input type="text" placeholder="Gender" v-model="signUpData.gender" />
-         -->
         <div class="genderClass">
           <div class="genOne">
-            <input type="radio" name="gender" value="male" v-model="signUpData.gender"/>
+            <input
+              type="radio"
+              name="gender"
+              value="male"
+              v-model="signUpData.gender"
+            />
             <span class="ms-2">Male</span>
           </div>
           <div class="genOne">
-            <input type="radio" name="gender" value="female" v-model="signUpData.gender"/>
+            <input
+              type="radio"
+              name="gender"
+              value="female"
+              v-model="signUpData.gender"
+            />
             <span class="ms-2">Female</span>
           </div>
         </div>
@@ -93,9 +123,9 @@
     <div class="form-container sign-in-container">
       <div class="form">
         <h2>Sign in</h2>
-        <input type="email" placeholder="Email" v-model="username"/>
-        <input type="password" placeholder="Password" v-model="password"/>
-        <a href="#">Forgot your password?</a>
+        <input type="text" placeholder="Username" v-model="username" />
+        <input type="password" placeholder="Password" v-model="password" />
+        <a @click="current_body = 'changePass'">Forgot your password?</a>
         <button @click="signInSubmit">Sign In</button>
         <div v-if="loginError" class="mt-2 signInErrorMsgHolder">
           <p class="mt-4 mb-0 text-danger" >
@@ -138,6 +168,15 @@ export default {
         profile_pic: "default.png",
       },
       retyped_password: "",
+
+      passForgotData: {
+        username: '',
+        privateKey: '',
+        password: '',
+        confirmPassword: ''
+      },
+      current_body: "",
+
       avatar_page: false,
 
       duplicateUsername: false,
@@ -162,7 +201,7 @@ export default {
     },
     selectAvatar() {
       // forward to avatar selection page
-      this.avatar_page = true;
+      this.current_body = "avatar";
     },
     backFromAvatarPage(){
       this.verificationMsg = false;
@@ -214,6 +253,11 @@ export default {
         this.loginError = true;
         this.loginErrorMessage = err.response ? err.response.data.message : "Unknown Error Occured"
       })
+    },
+    forgotPassword(){
+      // api to update password using this.passForgotData
+      // check if username is correct or not
+      // if updated successfully send back to the login page by setting this.current_body = ""
     },
     async signUpSubmit() {
       // Calls api for user registration
@@ -277,6 +321,14 @@ export default {
         this.$refs.retype_password.style.outline = "none";
       }
     },
+    "passForgotData.confirmPassword"(newValue){
+      if(newValue !== this.passForgotData.password){
+        this.$refs.passChangeRetype.style.outline = "1px solid red"
+      }
+      else{
+        this.$refs.passChangeRetype.style.outline = "none"
+      }
+    }
   },
 };
 </script>
@@ -307,10 +359,19 @@ export default {
 }
 
 .login a {
+  cursor: pointer;
   color: #333;
   font-size: 14px;
   text-decoration: none;
   margin: 15px 0;
+}
+
+.login a:hover{
+  color: #333;
+  font-weight: bold;
+  text-decoration: underline;
+  transform: scale(1.01);
+  transition: transform 100ms ease-out;
 }
 
 .login button {
@@ -339,6 +400,9 @@ export default {
   border-color: #ffffff;
 }
 
+.login .button-2 {
+  border: 1px solid rgb(255, 255, 255, 0.5);
+}
 .login .form {
   background-color: #ffffff;
   display: flex;
@@ -368,7 +432,7 @@ export default {
   width: 768px;
   margin-top: 11vh;
   max-width: 100%;
-  min-height: 480px;
+  /* min-height: 480px; */
   min-height: 600px;
 }
 
@@ -533,4 +597,6 @@ export default {
   font-size: xx-large;
   font-weight: bold;
 }
+
+
 </style>

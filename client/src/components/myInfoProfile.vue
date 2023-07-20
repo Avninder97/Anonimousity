@@ -1,20 +1,176 @@
 <template>
-    <div>
-        Username: <input type="text">
-        Organization: <input type="text">
-        Password: <input type="text">
-        Verification status: <input type="text">
-        Gender: <input type="text">
+  <div v-if="current_body === 'passChange'" class="container profile editable">
+    <div class="form bg-transparent">
+      <h2 class="my-3">Change Password</h2>
+      <input
+        type="text"
+        placeholder="Current Password"
+        v-model="passChangeData.currentPass"
+      />
+      <input
+        type="password"
+        placeholder="New Password"
+        v-model="passChangeData.password"
+      />
+      <input
+        type="password"
+        ref="passChangeRetype"
+        placeholder="Confirm new Password"
+        v-model="passChangeData.confirmPassword"
+      />
+      <div class="select">
+        <button class="m-2 button-2" @click="current_body = ''">Go Back</button>
+        <button class="m-2 button-2" @click="updatePassword()">Update</button>
+      </div>
     </div>
+  </div>
+  <div v-else class="container profile">
+    <div class="row">
+      <div class="col-3">Username</div>
+      <div class="col-9"><input type="text" disabled v-model="userData.username" /></div>
+    </div>
+    <div class="row">
+      <div class="col-3">Current Organization</div>
+      <div class="col-9"><input type="text" disabled   v-model="userData.organization"/></div>
+    </div>
+    <div class="row">
+      <div class="col-3">Gender</div>
+      <div class="col-9"><input type="text" disabled  v-model="userData.gender"/></div>
+    </div>
+    <div class="row">
+      <div class="col-3">Verification Status</div>
+      <div class="col-9"><input type="text" disabled  v-model="userData.is_verified"/></div>
+    </div>
+    <div class="row">
+      <div class="col-3">Password</div>
+      <div class="col-6"><input type="password" disabled  v-model="userData.password"/></div>
+      <div class="col-3 btn btn-success" @click="current_body = 'passChange'">
+        Change Password
+      </div>
+    </div>
+  </div>
 </template>
 <script>
-export default{
-    name: 'myInfoProfile',
-    data(){
-        return{
+export default {
+  name: "myInfoProfile",
+  data() {
+    return {
+      current_body: "",
+      userData: {
+        username: '',
+        organization: '',
+        gender: '',
+        is_verified: '',
+        password: 'fjosjfoijofnsdfljsdo'
+      },
 
-        }
-    },
-}
+      passChangeData: {
+        username: '',
+        currentPass: '',
+        password: '',
+        confirmPassword: ''
+      },
+    };
+  },
+  methods: {
+    updatePassword(){
+        // api to update password
+        // send data through this.passChangeData
+        // after successful updation set this.current_body = ""
+    }
+  }
+};
 </script>
-<style></style>
+<style>
+@import url("https://fonts.googleapis.com/css?family=Montserrat:400,800");
+
+.profile h2 {
+  color: rgb(123, 123, 150);
+  font-weight: bold;
+  margin: 0;
+}
+.profile input {
+  /* background-color: #eee; */
+  background-color: transparent;
+  border: none;
+  border-bottom: 1px solid white;
+  /* padding: 12px 15px; */
+  height: 2rem;
+  color: white;
+  font-size: large;
+  margin: 8px 0;
+  width: 100%;
+  outline: none;
+}
+.editable{
+    font-family: "Montserrat", sans-serif;
+}
+
+.editable input{
+    background-color: #eee;
+    height: auto;
+    color: black;
+    padding: 12px 15px;
+    width: 100%;
+    margin: 8px 0;
+}
+.profile button {
+  border-radius: 20px;
+  border: 1px solid rgb(255, 255, 255, 0.5);
+  background-color: rgb(58, 66, 109);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 12px 45px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  transition: transform 80ms ease-in;
+}
+.profile button:active {
+  transform: scale(0.95);
+}
+
+.profile button:focus {
+  outline: none;
+}
+
+.profile .form {
+  background-color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding: 0 50px;
+  height: 100%;
+  text-align: center;
+}
+
+.profile {
+  /* background-color: #fff; */
+  border-radius: 10px;
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
+  position: relative;
+  overflow: hidden;
+  width: 768px;
+  margin-top: 11vh;
+  max-width: 100%;
+  min-height: 480px;
+  /* min-height: 600px; */
+  background: linear-gradient(to right, rgb(66, 66, 66), rgb(78, 91, 107));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-evenly;
+}
+.profile .row {
+  /* display: flex; */
+  width: 100%;
+  align-items: center;
+}
+.profile .col-3 {
+  color: white;
+  font-weight: bold;
+  font-size: large;
+  text-align: right;
+}
+</style>
