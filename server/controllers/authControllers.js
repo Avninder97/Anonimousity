@@ -25,7 +25,7 @@ const authControllers = {
                 const foundUser = await User.findOne({ username });
                 if(!foundUser){
                     return res.status(404).json({
-                        message: "User not found"
+                        message: "User doesn't exist"
                     })
                 }else{
                     const match = await bcrypt.compare(password, foundUser.password);
@@ -41,9 +41,10 @@ const authControllers = {
                         message: "Incorrect Password"
                     })
                 }
-            }else{
-                throw "login error";
             }
+            return res.status(400).json({
+                message: "Invalid Credentials"
+            })
         }catch(error){
             inDev && console.log(error);
             return res.status(500).json({
