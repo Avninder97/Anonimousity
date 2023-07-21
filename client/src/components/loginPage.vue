@@ -597,6 +597,4 @@ export default {
   font-size: xx-large;
   font-weight: bold;
 }
-
-
 </style>
