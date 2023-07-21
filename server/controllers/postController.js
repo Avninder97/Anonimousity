@@ -48,7 +48,9 @@ const postControllers = {
     /* 
         This controller is responsible for creating the post
         and pushing it's ID to author's created Posts ref array 
-        and also it can handle the organization linkage to the post
+        and also it can handle the organization linkage to the post.
+
+        + It allows only admin level user to link other organization to their posts
         even if that specific organization is not present in db
 
         Complete
@@ -72,7 +74,7 @@ const postControllers = {
             
             // create or find the organization
             let foundOrganization = null;
-            if(organizationName){
+            if(foundUser.role === 'admin' && organizationName){
                 organizationName = organizationName.toLowerCase();
                 foundOrganization = await Organization.findOne({ name: organizationName });
                 if(!foundOrganization){
@@ -89,7 +91,7 @@ const postControllers = {
                 backgroundImage,
                 categories,
                 author: userId,
-                organization: organizationName ? foundOrganization._id : null
+                organization: foundOrganization ? foundOrganization._id : foundUser.currentEmployeer
             });
 
             foundUser.createdPosts.push(newPost._id);
@@ -108,7 +110,10 @@ const postControllers = {
 
     /*
         This controller is responsible for editing an existing post
-        in the database and also creating a new unverified organization in db if necessary
+        in the database.
+        
+        It can also create a new unverified organization in db if necessary
+        (admin feature only)
         
         Complete
     */
@@ -133,7 +138,7 @@ const postControllers = {
             foundPost.categories = categories;
             foundPost.backgroundImage = backgroundImage;
 
-            if(organizationName){
+            if(decoded.role === "admin" && organizationName){
                 const foundOrganization = await organization.findOne({name: organizationName});
                 if(!foundOrganization){
                     foundOrganization = await Organization.create({
@@ -162,13 +167,21 @@ const postControllers = {
         also remove it's own reference from the user (author) instance from the db 
         and delete itself as well
 
+        + Delete by admin functionality
+
         Complete and tested
     */
     deletePost: async (req, res) => {
         try {
             const { decoded } = req.body, { id } = req.params;
-            const userId = decoded.userId;
-            const foundPost = await Post.findOne({ _id: id, author: userId });
+            let authorId = decoded.userId;
+            let foundPost;
+            if(decoded.role === "admin"){
+                foundPost = await Post.findOne({ _id: id });
+                authorId = foundPost.author;
+            }else {
+                foundPost = await Post.findOne({ _id: id, author: authorId });
+            }
             if(!foundPost){
                 return res.status(404).json({
                     message: 'Post not found'
@@ -181,8 +194,14 @@ const postControllers = {
                     console.log(err);
                 }
             });
-            await Post.deleteOne({ _id: id, author: userId });
-            const foundUser = await User.findOne({ _id: userId });
+
+            if(decoded.role === "admin"){
+                await Post.deleteOne({ _id: id });
+            }else {
+                await Post.deleteOne({ _id: id, author: authorId });
+            }
+
+            const foundUser = await User.findOne({ _id: authorId });
             if(foundUser){
                 foundUser.createdPosts.pull(id);
             }
@@ -330,13 +349,19 @@ const postControllers = {
     deleteComment: async (req, res) => {
         try {
             const { id, cId } = req.params, currUserId = req.body.decoded.userId;
-            const deletedComment = await Comment.deleteOne({ _id: cId, author: currUserId, linkedToWhichPost: id });
-            const foundPost = await Post.findOne({ _id: id });
+            console.log(id, cId);
+            let deletedComment;
+            if(req.body.decoded.role === "admin"){
+                deletedComment = await Comment.deleteOne({ _id: cId, linkedToWhichPost: id });
+            }else{
+                deletedComment = await Comment.deleteOne({ _id: cId, author: currUserId, linkedToWhichPost: id });
+            }
             if(deletedComment.deletedCount == 0){
                 return res.status(404).json({
                     message: 'Comment not deleted'
                 })
             }
+            const foundPost = await Post.findOne({ _id: id });
             foundPost.comments.pull(cId);
             await foundPost.save();
             return res.status(200).json({
