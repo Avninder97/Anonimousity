@@ -695,5 +695,4 @@ export default {
   position: absolute;
   bottom: 25px;
 }
-
 </style>

@@ -2,8 +2,9 @@
   <nav class="navbar navbar-light ourNavbar fixed-top">
     <div class="container-fluid">
       <span class="navbar-brand text-light" @click="openFeeds">Anonymousity</span>
-
-      <div v-if="this.$store.state.loggedIn" class="mx-2">
+      <div>
+        <div v-if="this.$store.state.loggedIn" class="mx-2 userOptions">
+          <div class="addPost mx-3" @click="this.$router.push({name: 'addPost'})">+</div>
         <img
           src="../assets/b1.png"
           class="navbar-logo"
@@ -23,6 +24,8 @@
           Login/ SignUp
         </button>
       </div>
+      </div>
+      
     </div>
   </nav>
 </template>
@@ -57,6 +60,29 @@ export default {
   cursor: pointer;
 }
 .ourNav{
+  background-color: white;
+}
+.userOptions{
+  display: flex;
+  align-items: center;
+}
+.addPost{
+  user-select: none;
+  cursor: pointer;
+  font-size: xx-large;
+  color: white;
+  display: flex;
+  font-weight: 800;
+  align-items: center;
+  justify-content: center;
+  border-radius: 3px;
+  border: 2px solid white;
+  width: 35px;
+  height: 35px;
+}
+.addPost:hover{
+  color: inherit;
+  font-weight: 1000;
   background-color: white;
 }
 </style>
