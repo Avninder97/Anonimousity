@@ -39,7 +39,7 @@ module.exports.authorize = async (req, res, next) => {
         */
         inDev && console.log("Type check, ownerId => ", typeof ownerId, ", decoded.userId => ", typeof decoded.userId);
         console.log(ownerId == decoded.userId);
-        if(! decoded.userId == ownerId){
+        if(decoded.role !== "admin" && (decoded.userId !== ownerId)){
             return res.status(409).json({
                 message: "You are not authorized for this operation"
             });
