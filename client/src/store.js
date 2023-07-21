@@ -3,6 +3,7 @@ import { createStore } from 'vuex'
 const store = createStore({
     state(){
         return{
+            loggedIn: true,
             userToken: "",
             user: null
         }

@@ -1,6 +1,6 @@
 <template>
   <div v-if="current_body === 'passChange'" class="container profile editable">
-    <div class="form bg-transparent">
+    <div class="form">
       <h2 class="my-3">Change Password</h2>
       <input
         type="text"
@@ -135,7 +135,6 @@ export default {
 }
 
 .profile .form {
-  background-color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
