@@ -1,4 +1,7 @@
 <template>
+
+
+  <!-- Select avatar page -->
   <div class="container login avatars" v-if="current_body === 'avatar'">
     <div class="selected">
       <img :src="image(signUpData.profile_pic)" alt="" />
@@ -34,12 +37,14 @@
         Sign Up
       </button>
     </div>
-    <div>
+    <div class="registrationMsgHolder">
       <p v-if="verificationMsg">{{ verificationMsgContent }}</p>
       <p v-else-if="registerError">{{ registerErrorMessage }}</p>
     </div>
   </div>
 
+
+  <!-- Forgot Password Page -->
   <div
     class="container login avatars"
     v-else-if="current_body === 'changePass'"
@@ -55,13 +60,23 @@
       <input type="password" placeholder="New Password" v-model="passForgotData.password" />
       <input type="password" ref="passChangeRetype" placeholder="Confirm new Password" v-model="passForgotData.confirmPassword"/>
       <div class="select">
-        <button class="m-2 button-2" @click="current_body = ''">Go Back</button>
+        <button class="m-2 button-2" @click="backfromForgetPage()">Go Back</button>
         <button class="m-2 button-2" @click="forgotPassword()">Update</button>
+      </div>
+
+      <div v-if="passwordResetRes > 0" class="forgotMsgHolder">
+        <p :style="[passwordResetRes === 1 ? {'color': 'green'} : {'color' : 'red'}]">
+          {{ passwordResetMsg }}
+        </p>
       </div>
     </div>
   </div>
 
+
+  <!-- Login & Register Page -->
   <div v-else class="container login" ref="container">
+
+    <!-- SignUp component -->
     <div class="form-container sign-up-container">
       <div class="form">
         <h2>Create Account</h2>
@@ -118,8 +133,15 @@
         </div>
 
         <button @click="selectAvatar">Next</button>
+        <div v-if="showSignUpMsg" class="signUpMsgHolder">
+          <p style="color: red, word-wrap: normal">
+            Please Fill all the required fields properly
+          </p>
+        </div>
       </div>
     </div>
+
+    <!-- SignIn Component -->
     <div class="form-container sign-in-container">
       <div class="form">
         <h2>Sign in</h2>
@@ -149,6 +171,7 @@
       </div>
     </div>
   </div>
+
 </template>
 <script>
 import axios from 'axios';
@@ -156,6 +179,8 @@ export default {
   name: "loginPage",
   data() {
     return {
+      current_body: "",
+
       username: "",
       password: "",
       messageClass: "hide",
@@ -168,6 +193,7 @@ export default {
         profile_pic: "default.png",
       },
       retyped_password: "",
+      showSignUpMsg: false,
 
       passForgotData: {
         username: '',
@@ -175,7 +201,10 @@ export default {
         password: '',
         confirmPassword: ''
       },
-      current_body: "",
+      // 0 => don't show, 1 => success, 2 => error
+      passwordResetRes: 0,
+      passwordResetMsg: "",
+
 
       avatar_page: false,
 
@@ -201,14 +230,19 @@ export default {
     },
     selectAvatar() {
       // forward to avatar selection page
-      this.current_body = "avatar";
+      this.showSignUpMsg = false;
+      if((this.signUpData.username && this.signUpData.password && (this.signUpData.password === this.retyped_password) && this.signUpData.email)){
+        this.current_body = "avatar";
+      }else{
+        this.showSignUpMsg = true;
+      }
     },
     backFromAvatarPage(){
       this.verificationMsg = false;
       this.registerError = false;
       this.verificationMsgContent = "";
       this.registerErrorMessage = "";
-      this.avatar_page = false;
+      this.current_body = "";
       // this.$refs.container.classList.add("right-panel-active");
     },
     image(url) {
@@ -254,10 +288,51 @@ export default {
         this.loginErrorMessage = err.response ? err.response.data.message : "Unknown Error Occured"
       })
     },
-    forgotPassword(){
+    async forgotPassword(){
       // api to update password using this.passForgotData
       // check if username is correct or not
-      // if updated successfully send back to the login page by setting this.current_body = ""
+      // if updated successfully show message
+
+      this.passwordResetRes = 0;
+      this.passwordResetMsg = "";
+      if(this.passForgotData.password.trim() === ""){
+        this.passwordResetRes = 2;
+        this.passwordResetMsg = "Password fields cannot be empty";
+
+      }
+      else if(this.passForgotData.password !== this.passForgotData.confirmPassword){
+        this.passwordResetRes = 2;
+        this.passwordResetMsg = "Password & Confirm Password should match";
+      }
+      else{
+        const cookiesArray = document.cookie.split(';');
+        let ourToken;
+        cookiesArray.map((cString) => {
+          if(cString.split('=')[0] === 'token'){
+            ourToken = cString.split('=')[1];
+            ourToken.trim();
+          }
+        })
+        await axios.post('http://localhost:5000/api/auth/resetPassword', {
+          username: this.passForgotData.username,
+          private_key: this.passForgotData.privateKey,
+          newPassword: this.passForgotData.password
+        }, {
+          headers: {
+            Authorization: `Bearer ${ourToken}`
+          }
+        })
+        .then((response) => {
+          console.log(response)
+          this.passwordResetRes = 1;
+          this.passwordResetMsg = "Password reset successful";
+        })
+        .catch((err) => {
+          console.log(err);
+          this.passwordResetRes = 2;
+          this.passwordResetMsg = err.response && err.response.data && err.response.data.message ? err.response.data.message : "Error please try again";
+        })
+      }
     },
     async signUpSubmit() {
       // Calls api for user registration
@@ -598,5 +673,27 @@ export default {
   font-weight: bold;
 }
 
+.registrationMsgHolder {
+  height: 20px;
+}
+
+.registrationMsgHolder > p {
+  margin-top: 0px;
+}
+
+.signUpMsgHolder {
+  color: red;
+  position: absolute;
+  bottom: 10px;
+}
+
+.signUpMsgHolder > p {
+  word-wrap: break-word;
+}
+
+.forgotMsgHolder {
+  position: absolute;
+  bottom: 25px;
+}
 
 </style>
