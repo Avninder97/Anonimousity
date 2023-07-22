@@ -2,13 +2,13 @@
   <div class="container profile p-3 px-5">
     <div class="row">
       <div class="col text-start">Argusoft</div>
-      <div class="col align-self-center text-center">
+      <div class="col align-items-center text-center">
         <img src="../assets/employee.png" width="28" /> Current Employees()
       </div>
-      <div class="col align-self-center text-center">
+      <div class="col align-items-center text-center">
         <img src="../assets/followers.png" width="28" /> Followers()
       </div>
-      <div class="col align-self-center text-center">
+      <div class="col align-items-center text-center">
         <img src="../assets/verified.png" width="28" /> Verified
       </div>
       <div class="col text-end">
