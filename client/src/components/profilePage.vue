@@ -75,6 +75,7 @@
         @showBox="() => (this.ConfirmationBox = true)"
         v-show="show === 'privateKey'"
       />
+      <followingComp v-show="show === 'following'"/>
       <postCard v-show="show === 'posts'" class="card py-2" />
       <postCard v-show="show === 'posts'" class="card py-2" />
       <postCard v-show="show === 'posts'" class="card py-2" />
@@ -84,11 +85,12 @@
   </div>
 </template>
 <script>
+import axios from "axios";
 import myInfoProfile from "./myInfoProfile.vue";
 import postCard from "./postCard.vue";
 import changeAvatar from "./changeAvatar.vue";
 import privateKey from "./privateKey.vue";
-import axios from "axios";
+import followingComp from "./followingComp"
 
 export default {
   name: "profilePage",
@@ -109,6 +111,7 @@ export default {
     myInfoProfile,
     changeAvatar,
     privateKey,
+    followingComp
   },
   beforeMount(){
     // this.loading = true;

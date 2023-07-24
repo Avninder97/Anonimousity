@@ -5,6 +5,7 @@ import postDetails from './components/postDetails'
 import loginPage from "./components/loginPage";
 import accountActivation from './components/accountActivation'
 import addPost from './components/addPost.vue'
+import orgProfile from './components/orgProfile.vue'
 
 
 const routes = [
@@ -38,6 +39,11 @@ const routes = [
         path: "/addPost",
         component: addPost
     },
+    {
+        name: "orgProfile",
+        path: "/orgProfile",
+        component: orgProfile
+    }
 ]
 
 const router = createRouter({
