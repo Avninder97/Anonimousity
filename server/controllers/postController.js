@@ -15,12 +15,13 @@ const postControllers = {
                 posts: posts
             });
         } catch(err) {
+            // console.log(err)
             return res.status(500).json({
                 message: "Server Error"
             });
         }
     },
-
+    
     // Fetches a single post and populate it's references for likedBy & comments
     getSinglePost: async (req, res) => {
         try {
@@ -31,6 +32,7 @@ const postControllers = {
                     message: "Post not found"
                 });
             }
+            await foundPost.populate('author');
             await foundPost.populate('comments');
             await foundPost.populate('likedBy');
             return res.status(200).json({
