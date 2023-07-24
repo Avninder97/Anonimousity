@@ -4,8 +4,8 @@
       <h2 class="my-3">Change Password</h2>
       <input
         type="text"
-        placeholder="Current Password"
-        v-model="passChangeData.currentPass"
+        placeholder="Private Key"
+        v-model="passChangeData.private_key"
       />
       <input
         type="password"
@@ -23,6 +23,9 @@
         <button class="m-2 button-2" @click="updatePassword()">Update</button>
       </div>
     </div>
+    <div v-if="resetMsg">
+      <p>{{ resetMsg }}</p>
+    </div>
   </div>
   <div v-else class="container profile">
     <div class="row">
@@ -31,15 +34,15 @@
     </div>
     <div class="row">
       <div class="col-3">Current Organization</div>
-      <div class="col-9"><input type="text" disabled   v-model="userData.organization"/></div>
+      <div class="col-9"><input type="text" disabled v-model="userData.organization"/></div>
     </div>
     <div class="row">
       <div class="col-3">Gender</div>
-      <div class="col-9"><input type="text" disabled  v-model="userData.gender"/></div>
+      <div class="col-9"><input type="text" disabled v-model="userData.gender"/></div>
     </div>
     <div class="row">
       <div class="col-3">Verification Status</div>
-      <div class="col-9"><input type="text" disabled  v-model="userData.is_verified"/></div>
+      <div class="col-9"><input type="text" disabled v-model="userData.is_verified"/></div>
     </div>
     <div class="row">
       <div class="col-3">Password</div>
@@ -51,32 +54,58 @@
   </div>
 </template>
 <script>
+
+import axios from 'axios';
+
 export default {
   name: "myInfoProfile",
+  props: {
+    user: Object
+  },
   data() {
     return {
       current_body: "",
       userData: {
-        username: '',
-        organization: '',
-        gender: '',
-        is_verified: '',
-        password: 'fjosjfoijofnsdfljsdo'
+        username: this?.user?.username,
+        organization: this.user.currentEmployeer ? this.user.currentEmployeer : "None",
+        gender: this.user.gender,
+        is_verified: this.user.isVerified,
+        password: 'dummyPasswordHolder'
       },
 
       passChangeData: {
-        username: '',
-        currentPass: '',
+        username: this.user.username,
+        private_key: '',
         password: '',
         confirmPassword: ''
       },
+      resetMsg: ''
     };
   },
   methods: {
-    updatePassword(){
+    async updatePassword(){
         // api to update password
         // send data through this.passChangeData
         // after successful updation set this.current_body = ""
+      this.resetMsg = '';
+      if(this.passChangeData.private_key && this.passChangeData.password.trim() && this.passChangeData.password === this.passChangeData.confirmPassword){
+        await axios.post('http://localhost:5000/api/auth/resetPassword', {
+          username: this.passChangeData.username,
+          private_key: this.passChangeData.private_key,
+          newPassword: this.passChangeData.password
+        })
+        .then((response) => {
+          console.log(response)
+          this.resetMsg = "Password reset successful";
+        })
+        .catch((err) => {
+          console.log(err);
+          this.resetMsg = err.response && err.response.data && err.response.data.message ? err.response.data.message : "Error please try again";
+        })
+      }else{
+        this.resetMsg = 'Please fill all the fields';
+      }
+      // console.log(this.passChangeData);
     }
   }
 };

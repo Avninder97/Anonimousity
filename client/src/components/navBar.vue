@@ -16,7 +16,7 @@
         <ul class="dropdown-menu dropdown-menu-end">
           <li class="dropdown-item" @click="openProfile">Profile</li>
           <li><hr class="dropdown-divider" /></li>
-          <li class="dropdown-item" @click="changeLog">Log Out</li>
+          <li class="dropdown-item" @click="logoutUser">Log Out</li>
         </ul>
       </div>
       <div v-else>
@@ -42,8 +42,16 @@ export default {
     openFeeds() {
       this.$router.push({ name: "feedPage" });
     },
+    logoutUser() {
+      let expirationDate = new Date();
+      expirationDate.setFullYear(expirationDate.getFullYear() - 1);
+      document.cookie = "token=; expires=" + expirationDate.toUTCString() + "; path=/";
+      console.log("cookie deleted");
+      this.$store.commit('changeLoginStatus', false);
+      this.$store.commit('updateToken', null);
+      this.$router.push({name: 'loginPage'})
+    },
     changeLog() {
-      // this.$store.commit("changeLog");
       this.$router.push({name: 'loginPage'})
     },
   },

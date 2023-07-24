@@ -258,7 +258,7 @@ export default {
         username: this.username,
         password: this.password
       })
-      .then((data) => {
+      .then(async (data) => {
         let token = data.data.token;
         console.log(token);
         document.cookie = `token=${token}`;
@@ -267,6 +267,10 @@ export default {
         this.loginError = false;
         this.loginErrorMessage = "";
 
+        this.$store.commit('changeLoginStatus', true);
+        this.$store.commit('updateToken', token);
+
+        
         // jwt payload extraction
         let payload = token.split('.')[1];
         payload = payload.replace(/-/g, '+').replace(/_/g, '/');
@@ -274,10 +278,10 @@ export default {
           return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
         }).join(''));
         payload = JSON.parse(payload);
-        console.log(payload);
+        console.log(token);
         
-        this.$store.commit('updateToken', token);
         this.$store.commit('updateUser', payload);
+        
         this.$router.push('/');
       })
       .catch((err) => {
@@ -286,6 +290,9 @@ export default {
         this.password = "";
         this.loginError = true;
         this.loginErrorMessage = err.response ? err.response.data.message : "Unknown Error Occured"
+        this.$store.commit('changeLoginStatus', false);
+        this.$store.commit('updateToken', null);
+
       })
     },
     async forgotPassword(){
@@ -305,22 +312,10 @@ export default {
         this.passwordResetMsg = "Password & Confirm Password should match";
       }
       else{
-        const cookiesArray = document.cookie.split(';');
-        let ourToken;
-        cookiesArray.map((cString) => {
-          if(cString.split('=')[0] === 'token'){
-            ourToken = cString.split('=')[1];
-            ourToken.trim();
-          }
-        })
         await axios.post('http://localhost:5000/api/auth/resetPassword', {
           username: this.passForgotData.username,
           private_key: this.passForgotData.privateKey,
           newPassword: this.passForgotData.password
-        }, {
-          headers: {
-            Authorization: `Bearer ${ourToken}`
-          }
         })
         .then((response) => {
           console.log(response)

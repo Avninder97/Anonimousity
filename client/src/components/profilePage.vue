@@ -54,11 +54,21 @@
     </div>
     <!-- Check-Mode -->
     <div class="col-10 selected_data">
+      <div id="spinnerHolder" v-if="show === 'loading'">
+        <div class="spinner-border profileLoader">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
+      <div v-if="show === 'error'">
+        <h1>
+          An Error Occured :(
+        </h1>
+      </div>
       <changeAvatar
         v-show="show === 'changeAvatar'"
         @back="() => this.optionChange('i')"
       />
-      <myInfoProfile v-show="show === 'myInfo'" />
+      <myInfoProfile v-if="show === 'myInfo'" :user="userData"/>
       <!-- While using privateKey component, keep props and emits being used in mind -->
       <privateKey
         :confirmationBox="ConfirmationBox"
@@ -78,17 +88,19 @@ import myInfoProfile from "./myInfoProfile.vue";
 import postCard from "./postCard.vue";
 import changeAvatar from "./changeAvatar.vue";
 import privateKey from "./privateKey.vue";
+import axios from "axios";
 
 export default {
   name: "profilePage",
   data() {
     return {
+      userData: null,
       myInfoClass: "selectedOption",
       postsClass: "profilePageOptions",
       likedClass: "profilePageOptions",
       followingClass: "profilePageOptions",
       privateKeyClass: "profilePageOptions",
-      show: "myInfo",
+      show: "loading",
       ConfirmationBox: false,
     };
   },
@@ -97,6 +109,41 @@ export default {
     myInfoProfile,
     changeAvatar,
     privateKey,
+  },
+  beforeMount(){
+    // this.loading = true;
+    this.show = 'loading';
+    if (document.cookie.indexOf('token') === -1) {
+      console.log('Cookie not found.');
+      this.$store.commit('changeLoginStatus', false);
+      this.$store.commit('updateToken', null);
+      this.loading = false;
+      this.$router.push({name: 'loginPage'});
+    }
+
+    const cookiesArray = document.cookie.split(';');
+    let ourToken = "";
+    cookiesArray.map((cString) => {
+      if(cString.split('=')[0] === 'token'){
+        ourToken = cString.split('=')[1];
+        ourToken.trim();
+      }
+    });
+    console.log("userToken => ", this.$store.state.userToken);
+    axios.get(`http://localhost:5000/api/users/64b0d9363b6fc6b67df002e7/profile`, {
+      headers: {
+        Authorization: `Bearer ${ourToken}`
+      }
+    })
+    .then((response) => {
+      // console.log(response.data.user);
+      this.userData = response.data.user;
+      this.show = 'myInfo';
+    })
+    .catch((err) => {
+      console.log(err);
+      this.show = 'error'
+    })
   },
   methods: {
     image(url) {
@@ -219,4 +266,23 @@ export default {
   width: 100%;
   border-radius: 25px;
 }
+
+.profileLoader {
+  width: 100px;
+  height: 100px;
+  align-self: center;
+  /* margin: auto; */
+}
+
+#spinnerHolder {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-content: center;
+  height: 80%;
+  /* border: 2px white solid; */
+  /* height: 100%; */
+}
+
 </style>
