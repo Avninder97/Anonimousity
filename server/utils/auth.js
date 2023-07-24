@@ -11,6 +11,6 @@ module.exports.generateToken = (userId, username, role, picUrl, isVerified) => {
     }, 
     key, 
     {
-        expiresIn: '1h'
+        expiresIn: '24h'
     });
 };

@@ -5,6 +5,10 @@ const authControllers = require('../controllers/authControllers');
 
 
 router
+    .route('/isLoggedIn')
+    .post(authMiddlewares.validate, authControllers.isLoggedIn)
+
+router
     .route('/login')
     .post(authControllers.userLogin);
 

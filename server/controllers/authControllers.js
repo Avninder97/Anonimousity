@@ -264,6 +264,18 @@ const authControllers = {
                 message: "Server Error"
             })
         }
+    },
+    isLoggedIn: async (req, res) => {
+        try {
+            // Check has been already performed in middlewares
+            return res.status(200).json({
+                message: "loggedIn"
+            });
+        } catch(err) {
+            return res.status(500).json({
+                message: "Server Error"
+            })
+        }
     }
 }
 

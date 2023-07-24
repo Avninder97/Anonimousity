@@ -1,20 +1,34 @@
 const jwt = require('jsonwebtoken');
+const { generateToken } = require('../utils/auth');
 const inDev = process.env.INDEVMODE;
 
 module.exports.validate = async (req, res, next) => {
     try {
+        // console.log(req.headers);
         const auth_header = req.headers.authorization;
         if(!auth_header){
             return res.status(401).json({
                 message: 'Unauthorized request'
             });
         }
+        // console.log(auth_header)
         const token = auth_header.split(' ')[1];
         const decoded = await jwt.verify(token, process.env.SECRET_KEY);
         req.body.decoded = decoded;
+
+        /*
+            To-Do =>
+            
+            For version 2 add refresh functionality for jwt token using access and refresh token
+
+            const { userId, username, role, picUrl, isVerified } = decoded;
+            const newToken = generateToken(userId, username, role, picUrl, isVerified);
+            res.cookie('user', newToken);    
+        */
         inDev && console.log(decoded);
         next();
     }catch(err) {
+        console.log(err);
         return res.status(403).json({
             message: 'Invalid token'
         })
