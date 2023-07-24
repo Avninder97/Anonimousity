@@ -10,12 +10,16 @@ const postControllers = {
     getPosts: async (req, res) => {
         try {
             const posts = await Post.find({});
+            for(let i=0;i<posts.length;i++){
+                await posts[i].populate('author');
+                await posts[i].populate('organization');
+            }
             return res.status(200).json({
                 message: "Success",
                 posts: posts
             });
         } catch(err) {
-            // console.log(err)
+            inDev && console.log(err)
             return res.status(500).json({
                 message: "Server Error"
             });

@@ -3,13 +3,13 @@
     <div class="container postcard">
       <div class="row postHead mb-3 pb-1" style="border-bottom: 1px dotted rgb(240,234,234, 0.5);">
         <div class="col-1">
-          <img :src="image(postDetail.image_url)" alt="Hello" />
+          <!-- <img :src="image(singlePost.author.profile_pic)" alt="Hello" /> -->
         </div>
 
         <div class="col-10 heading p-0">
           <h5>
-            <span class="userName">{{ postDetail.postMaker }} </span><br />
-            <span class="orgName">{{ postDetail.postOrg }}</span>
+            <span class="userName">{{ singlePost.author.username }} </span><br/>
+            <span class="orgName">{{ singlePost.organization ? singlePost.organization.name : "" }}</span>
           </h5>
         </div>
       </div>
@@ -34,8 +34,8 @@
         </div>
         <div class="col-10" v-else>
           <p style="text-align: justify;">
-            <span class="postTitle">{{ title }} </span><br />
-            <span class="postContent">{{ content }}</span>
+            <span class="postTitle">{{ singlePost.title }} </span><br />
+            <span class="postContent">{{ singlePost.description }}</span>
           </p>
         </div>
       </div>
@@ -92,19 +92,13 @@
 
 export default {
   name: "postCard",
+  props: {
+    singlePost: Object,
+    editable: Boolean
+  },
   data() {
     return {
-      postDetail: {
-        image_url: "b2.png",
-        postMaker: "Prateek Kumar",
-        postOrg: "Argusoft",
-        postTitle: "First Post",
-        postContent:
-          "Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of (The Extremes of Good and Evil) by Cicero, written in 45 BC. This book is a treatise on the theory of ethics, very popular during the Renaissance. The first line of Lorem Ipsum, Lorem ipsum dolor sit amet.., comes from a line in section 1.10.32.The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for those interested. Sections 1.10.32 and 1.10.33 from by Cicero are also reproduced in their exact original form, accompanied by English versions from the 1914 translation by H. Rackham.",
-        likeCount: 505,
-        commentCount: 89,
-      },
-      likeAmount: 0,
+      likeAmount: this.singlePost.likedBy.length,
       editContent: false,
       content: "",
       title: "",
@@ -156,9 +150,9 @@ export default {
     },
   },
   mounted() {
-    this.likeAmount = this.postDetail.likeCount;
-    this.content = this.postDetail.postContent;
-    this.title = this.postDetail.postTitle;
+    this.likeAmount = this.singlePost.likedBy.length;
+    this.content = this.singlePost.description;
+    this.title = this.singlePost.title;
   },
 };
 </script>
@@ -170,6 +164,8 @@ export default {
 .postcard {
   border-radius: 25px;
   /* padding: 10px 20px; */
+  border: 2px solid red;
+  margin: 2rem auto;
 }
 .postHead {
   padding: 20px 20px 0px;

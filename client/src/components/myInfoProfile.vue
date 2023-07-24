@@ -67,7 +67,7 @@ export default {
       current_body: "",
       userData: {
         username: this?.user?.username,
-        organization: this.user.currentEmployeer ? this.user.currentEmployeer : "None",
+        organization: this.user?.currentEmployeer?.name ? this.user.currentEmployeer.name : "None",
         gender: this.user.gender,
         is_verified: this.user.isVerified,
         password: 'dummyPasswordHolder'
