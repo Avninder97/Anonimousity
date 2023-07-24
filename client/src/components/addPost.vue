@@ -2,6 +2,7 @@
   <div class="container newPost">
     <div class="form">
       <h2 class="my-3">Add new Post</h2>
+      <h6 v-if="showWarning" class="warning">*All fields are necessary</h6>
       <input
         type="text"
         placeholder="Add title of your post"
@@ -16,28 +17,52 @@
       ></textarea>
       <div>
         <button class="mx-2" @click="this.$router.back()">Back</button>
-      <button class="m-2" @click="addPost()">Add</button>  
-      </div>      
+        <button class="m-2" @click="addPost()">Add</button>
+      </div>
     </div>
   </div>
 </template>
 <script>
+import axios from "axios";
+
 export default {
   name: "addPost",
   data() {
     return {
-        newPost:{
-            title: '',
-            description: ''
-        }
+      newPost: {
+        title: "",
+        description: "",
+      },
+      showWarning: false
     };
   },
-  methods:{
-    addPost(){
-    // api for adding a new post to database using this.newPost
-    // after succesful updation forward to post page this.$router.push({name: 'postDetails'})
-    }
-  }
+  methods: {
+    addPost() {
+      if(!this.newPost.title || !this.newPost.description){
+        this.showWarning = true
+        console.log("All fields are necessary")
+        return
+      }
+      const url = `http://localhost:5000/api/posts/new`;
+      const ourToken = this.$store.state.userToken;
+      axios
+        .post(url, this.newPost, {
+          headers: {
+            Authorization: `Bearer ${ourToken}`,
+          },
+        })
+        .then((response) => {
+          console.log("message:", response.data.message);
+          if (response.data.message === "Post created successfully"){
+            this.$router.push({ path: `/post/${response.data.data._id}` });
+          }
+          
+        })
+        .catch((err) => {
+          console.log("Error \n",err);
+        });
+    },
+  },
 };
 </script>
 <style>
@@ -101,5 +126,13 @@ export default {
 
 .newPost button:focus {
   outline: none;
+}
+
+.warning{
+  position: absolute;
+  top: 4.5rem;
+  color: red;
+  letter-spacing: 1px;
+  font-weight: bold;
 }
 </style>
