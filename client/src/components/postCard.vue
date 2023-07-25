@@ -1,72 +1,69 @@
 <template>
   <!-- <div class="postbody"> -->
-  <div class="container postcard">
-    <div
-      class="row postHead mb-3 pb-1"
-      style="border-bottom: 1px dotted rgb(240, 234, 234, 0.5)"
-    >
-      <div class="col-1">
-        <img :src="image(details.profile_pic)" alt="Hello" />
-      </div>
-
-      <div class="col-10 heading p-0">
-        <h5>
-          <span class="userName">{{ details.username }} </span><br />
-          <span class="orgName">{{ details.name }}</span>
-        </h5>
-      </div>
-    </div>
-    <!-- <hr /> -->
-    <div class="row mb-2">
-      <div class="col-1"></div>
-      <div class="col-10" v-if="editContent">
-        <input
-          type="text"
-          class="editTitle"
-          ref="editInput"
-          @blur="editCompleted('input')"
-          v-model="title"
-        />
-        <textarea
-          v-model="description"
-          ref="editBox"
-          @blur="editCompleted('textarea')"
-          @input="adaptHeight"
-          class="editArea"
-        />
-      </div>
-      <div class="col-10" v-else>
-        <p style="text-align: justify">
-          <span class="postTitle">{{ details.title }} </span><br />
-          <span class="postContent">{{ details.description }}</span>
-        </p>
-      </div>
-    </div>
-    <!--  -->
-    <div class="row">
-      <div class="col-1"></div>
-      <div class="col-10 actions">
-        <div class="likeButton">
-          <img
-            @click="toggleLike()"
-            v-if="liked"
-            src="../assets/liked_design.png"
-            alt=" "
-            width="24"
-            class="mx-2"
-          />
-          <img
-            @click="toggleLike()"
-            v-else
-            src="../assets/design.png"
-            width="24"
-            alt="like"
-            class="mx-2"
-          />
-          <span class="me-2">{{ details.likeCount }}</span>
+    <div class="container postcard">
+      <div class="row postHead mb-3 pb-1" style="border-bottom: 1px dotted rgb(240,234,234, 0.5);">
+        <div class="col-1">
+          <!-- <img :src="image(singlePost.author.profile_pic)" alt="Hello" /> -->
         </div>
-        <div class="editButton">
-          <img
+
+        <div class="col-10 heading p-0">
+          <h5>
+            <span class="userName">{{ singlePost.author.username }} </span><br/>
+            <span class="orgName">{{ singlePost.organization ? singlePost.organization.name : "" }}</span>
+          </h5>
+        </div>
+      </div>
+      <!-- <hr /> -->
+      <div class="row mb-2">
+        <div class="col-1"></div>
+        <div class="col-10" v-if="editContent && currentUserId === singlePost.author._id">
+          <input
+            type="text"
+            class="editTitle"
+            ref="editInput"
+            @blur="editCompleted('input')"
+            v-model="title"
+          />
+          <textarea
+            v-model="content"
+            ref="editBox"
+            @blur="editCompleted('textarea')"
+            @input="adaptHeight"
+            class="editArea"
+          />
+        </div>
+        <div class="col-10" v-else>
+          <p style="text-align: justify;">
+            <span class="postTitle">{{ singlePost.title }} </span><br />
+            <span class="postContent">{{ singlePost.description }}</span>
+          </p>
+        </div>
+      </div>
+      <!--  -->
+      <div class="row">
+        <div class="col-1"></div>
+        <div class="col-10 actions">
+          <div class="likeButton">
+            <img
+              @click="toggleLike()"
+              v-if="liked"
+              src="../assets/liked_design.png"
+              alt=" "
+              width="24"
+              class="mx-2"
+            />
+            <img
+              @click="toggleLike()"
+              v-else
+              src="../assets/design.png"
+              width="24"
+              alt="like"
+              class="mx-2"
+            />
+            <span class="me-2">{{ likeAmount }}</span>
+          </div>
+          <div class="editButton" v-if="currentUserId === singlePost.author._id">
+            <img
             v-if="editContent"
             @click="enableEdit"
             src="../assets/editing_design.png"
@@ -91,24 +88,24 @@
   <!-- </div> -->
 </template>
 <script>
+import axios from 'axios';
+
 export default {
   name: "postCard",
+  props: {
+    singlePost: Object,
+    currentUserId: String,
+    uToken: String,
+  },
   data() {
     return {
-      likeAmount: 0,
+      likeAmount: this.singlePost.likedBy.length,
       editContent: false,
-
-      liked: false,
-      imgPath: "",
-      details: this.postDetail,
-      description: "",
+      content: "",
       title: "",
+      liked: this.singlePost?.likedBy?.some((id) => id === this.currentUserId),
     };
   },
-  props: {
-    postDetail: Object,
-  },
-
   methods: {
     image(url) {
       console.log("url => ", url);
@@ -121,17 +118,35 @@ export default {
         console.log("Error caught");
       }
     },
-    toggleLike() {
-      if (!this.liked) {
-        this.details.likeCount++;
-      } else {
-        this.details.likeCount--;
-      }
-      // update like values in database
+
+    async toggleLike() {
+      // console.log(this.currentUserId === this.singlePost.author._id)
+      // console.log(this.currentUserId, this.singlePost.author._id)
       this.liked = !this.liked;
+      await axios.post(`http://localhost:5000/api/posts/${this.singlePost?._id}/like`, {}, {
+        headers: {
+          Authorization: `Bearer ${this.uToken}`
+        }
+      })
+      .then((response) => {
+        console.log(response)
+        this.liked = response?.data?.newStatus;
+        this.likeAmount = response?.data?.likeCount;
+      })
+      .catch((err) => {
+        console.log(err)
+        this.liked = !this.liked;
+      })
+      // if (!this.liked) {
+      //   this.likeAmount++;
+      // } else {
+      //   this.likeAmount--;
+      // }
+      // // update like values in database
     },
 
     enableEdit() {
+      console.log(this.title, this.content);
       this.editContent = true;
       this.title = this.details.title;
       this.description = this.details.description;
@@ -166,15 +181,10 @@ export default {
       myTextarea.style.height = myTextarea.scrollHeight + "px";
     },
   },
-  beforeMount() {
-    // this.post = this.postDetail
-    console.log("1");
-    // this.likeAmount = this.details.likeCount;
-    // this.description = this.details.description;
-    // this.title = this.details.title;
-    console.log("2 before mount", this.postDetail);
-    console.log("3", this.likeAmount, this.description, this.title);
-    console.log("4", this.details);
+  mounted() {
+    this.likeAmount = this.singlePost.likedBy.length;
+    this.content = this.singlePost.description;
+    this.title = this.singlePost.title;
   },
 };
 </script>
@@ -185,6 +195,9 @@ export default {
 }
 .postcard {
   border-radius: 25px;
+  /* padding: 10px 20px; */
+  border: 2px solid red;
+  margin: 2rem auto;
 }
 .postHead {
   padding: 20px 20px 0px;

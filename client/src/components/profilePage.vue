@@ -54,33 +54,52 @@
     </div>
     <!-- Check-Mode -->
     <div class="col-10 selected_data">
+
+      <!-- Loader -->
       <div id="spinnerHolder" v-if="show === 'loading'">
         <div class="spinner-border profileLoader">
           <span class="visually-hidden">Loading...</span>
         </div>
       </div>
+
+      <!-- Error page -->
       <div v-if="show === 'error'">
         <h1>
           An Error Occured :(
         </h1>
       </div>
+
+      <!-- Change Avatar -->
       <changeAvatar
-        v-show="show === 'changeAvatar'"
+        v-if="show === 'changeAvatar'"
         @back="() => this.optionChange('i')"
       />
+
+      <!-- Profile info page -->
       <myInfoProfile v-if="show === 'myInfo'" :user="userData"/>
+
+
       <!-- While using privateKey component, keep props and emits being used in mind -->
       <privateKey
         :confirmationBox="ConfirmationBox"
+        :userData="userData"
         @showBox="() => (this.ConfirmationBox = true)"
-        v-show="show === 'privateKey'"
+        v-if="show === 'privateKey'"
       />
+
+      <!-- Following page -->
       <followingComp v-show="show === 'following'"/>
-      <postCard v-show="show === 'posts'" class="card py-2" />
-      <postCard v-show="show === 'posts'" class="card py-2" />
-      <postCard v-show="show === 'posts'" class="card py-2" />
-      <postCard v-show="show === 'posts'" class="card py-2" />
-      <postCard v-show="show === 'posts'" class="card py-2" />
+
+      <!-- Created Posts -->
+      <div v-if="show === 'createdPosts'">
+        <postCard v-for="(post, index) in userData.createdPosts" :key="index" :singlePost="post" class="pb-4" :currentUserId="loggedInUserId" :uToken="token"/>
+      </div>
+
+      <!-- Liked Posts -->
+      <div v-if="show === 'likedPosts'">
+        <postCard v-for="(post, index) in userData.likedPosts" :key="index" :singlePost="post" class="pb-4" :currentUserId="loggedInUserId" :uToken="token"/>
+      </div>
+
     </div>
   </div>
 </template>
@@ -104,6 +123,8 @@ export default {
       privateKeyClass: "profilePageOptions",
       show: "loading",
       ConfirmationBox: false,
+      loggedInUserId: "",
+      token: "",
     };
   },
   components: {
@@ -132,8 +153,18 @@ export default {
         ourToken.trim();
       }
     });
+    this.token = ourToken;
+    let payload = ourToken.split('.')[1];
+    payload = payload.replace(/-/g, '+').replace(/_/g, '/');
+    payload = decodeURIComponent(window.atob(payload).split('').map(function(c) {
+      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+    payload = JSON.parse(payload);
+    console.log(payload.userId);
+    this.loggedInUserId = payload.userId;
+
     console.log("userToken => ", this.$store.state.userToken);
-    axios.get(`http://localhost:5000/api/users/64b0d9363b6fc6b67df002e7/profile`, {
+    axios.get(`http://localhost:5000/api/users/anythingWorkHere/profile`, {
       headers: {
         Authorization: `Bearer ${ourToken}`
       }
@@ -167,11 +198,11 @@ export default {
           break;
         case "p":
           this.postsClass = "selectedOption";
-          this.show = "posts";
+          this.show = "createdPosts";
           break;
         case "l":
           this.likedClass = "selectedOption";
-          this.show = "liked";
+          this.show = "likedPosts";
           break;
         case "f":
           this.followingClass = "selectedOption";

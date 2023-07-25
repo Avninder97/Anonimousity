@@ -1,6 +1,6 @@
 <template>
   <div class="feedBody">
-    <postCard class="card py-2">
+    <!-- <postCard class="card py-2">
       <div class="input-group addComments ms-2">
         <input type="text" placeholder="Add a Comment" class="inputControl" v-model="newComment"/>
         <span @click="addComment" class="input-group-text arrow" ref="commentArrow">>></span>
@@ -9,11 +9,13 @@
     <postCard class="card my-2 py-2"></postCard>
     <postCard class="card my-2 py-2"></postCard>
     <postCard class="card my-2 py-2"></postCard>
-    <postCard class="card my-2 py-2"></postCard>
+    <postCard class="card my-2 py-2"></postCard> -->
+
+    <h1>hello world</h1>
   </div>
 </template>
 <script>
-import postCard from './postCard.vue';
+// import postCard from './postCard.vue';
 export default {
   data(){
     return{
@@ -21,7 +23,7 @@ export default {
     }
   },
   components:{
-    postCard,
+    // postCard,
   },
   methods:{
     addComment() {
