@@ -89,7 +89,7 @@
 
       <!-- Following page -->
       <div v-if="show === 'following'">
-        <followingComp v-for="(organization, index) in userFollowing" :key="index" :singleOrganization="organization" :currentUserId="loggedInUserId" :uToken="token"/>
+        <followingComp v-for="(organization, index) in userFollowing" :key="index" :singleOrganization="organization" :currentUserId="loggedInUserId" :uToken="token" :handleUpdate="fetchFollowing"/>
       </div>
 
       <!-- Created Posts -->

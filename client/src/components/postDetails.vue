@@ -1,5 +1,13 @@
 <template>
-  <div class="postPage">
+  <div v-if="loading" id="spinnerHolder">
+    <div class="spinner-border postLoader" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+  <div v-else-if="error" class="postError">
+    <h1>404 - Post Not Found</h1>
+  </div>
+  <div v-else class="postPage">
     <postCard :singlePost="singlePost" class="sepForComms pb-3 mb-4">
       <div class="input-group addComments ms-2">
         <input
@@ -17,7 +25,7 @@
       </div>
     </postCard>
     <!-- Put a v-for loop for comments gathered from database -->
-    <div class="commentArea">
+    <div class="commentArea" v-if="singlePost.comments">
       <commentCard v-for="(comment, index) in singlePost.comments" :key="index" :comment_data="comment" :token="token" :loggedInUserId="loggedInUserId"/>
     </div>
   </div>
@@ -36,6 +44,8 @@ export default {
       newComment: "",
       token: "",
       loggedInUserId: "",
+      loading: false,
+      error: false
     };
   },
   components: {
@@ -43,7 +53,8 @@ export default {
     postCard,
   },
   beforeMount() {
-
+    this.loading = true;
+    this.error = false;
     try{
       const cookiesArray = document.cookie.split(';');
       let ourToken = "";
@@ -78,10 +89,16 @@ export default {
           // console.log("message:", response.data.message);
           console.log(response.data.post);
           this.singlePost = response.data.post;
+          this.loading = false;
         })
         .catch((err) => {
           console.log("Error \n", err);
+          this.loading = false;
+          this.error = true;
         });
+    }else{
+      this.loading = false;
+      this.error = true;
     }
   },
   methods: {
@@ -150,6 +167,31 @@ export default {
   user-select: none;
   cursor: pointer;
 }
+
+#spinnerHolder {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-content: center;
+  height: 60vh;
+}
+
+.postLoader {
+  width: 100px;
+  height: 100px;
+  align-self: center;
+}
+
+.postError {
+  width: 100%;
+  height: 60vh;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
 /* .postPage .commentArea{
   overflow: auto;
   height: 400px;
