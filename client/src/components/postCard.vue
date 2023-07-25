@@ -107,7 +107,7 @@ export default {
     currentUserId: String,
     uToken: String,
     handleUpdate: Function,
-    fromPage: String
+    fromPage: String,
   },
   data() {
     return {
@@ -118,9 +118,10 @@ export default {
       liked: this.singlePost?.likedBy?.some((id) => id === this.currentUserId),
       prevTitle: "",
       prevDesc: "",
+      currId: this.singlePost._id,
     };
   },
-  emits:['postDeleted'],
+  emits: ["postDeleted"],
   methods: {
     image(url) {
       console.log("url => ", url);
@@ -228,8 +229,7 @@ export default {
       myTextarea.style.height = myTextarea.scrollHeight + "px";
     },
     deletePost() {
-      const currId = this.singlePost._id
-      const url = `http://localhost:5000/api/posts/${currId}/delete`;
+      const url = `http://localhost:5000/api/posts/${this.currId}/delete`;
       const ourToken = this.$store.state.userToken;
       axios
         .post(
@@ -248,24 +248,23 @@ export default {
           // Write an if condition for the component call from postDetails page
           // If yes use this.$router.back()
           // else condition written below
-          if(this.fromPage){
-            this.$router.push({name: 'feedPage'})
+          if (this.fromPage) {
+            this.$router.push({ name: "feedPage" });
+          } else {
+            console.log("Sending to parent:", this.currId);
+            this.$emit("postDeleted", this.currId);
           }
-          else{
-            console.log("Sending to parent:", currId)
-            this.$emit('postDeleted', currId)
-          }
-
         })
         .catch((err) => {
           console.log("Error \n", err);
         });
     },
   },
-  mounted() {
+  updated() {
     this.likeAmount = this.singlePost.likedBy.length;
     this.description = this.singlePost.description;
     this.title = this.singlePost.title;
+    this.currId = this.singlePost._id;
     this.prevTitle = this.title;
     this.prevDesc = this.description;
   },

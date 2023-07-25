@@ -118,6 +118,7 @@
           :currentUserId="loggedInUserId"
           :uToken="token"
           :handleUpdate="fetchLikedPosts"
+          @postDeleted="(id) => postDeleted(id)"
         />
       </div>
     </div>
@@ -150,6 +151,7 @@ export default {
       userFollowing: [],
     };
   },
+
   components: {
     postCard,
     myInfoProfile,
@@ -217,57 +219,66 @@ export default {
     fetchCreatedPosts() {
       this.show = "loading";
       console.log(this.token);
-      axios.get('http://localhost:5000/api/users/profile/createdPosts', {
-        headers: {
-          Authorization: `Bearer ${this.token}`
-        }
-      })
-      .then((response) => {
-        console.log(response);
-        this.userCreatedPosts = response?.data?.createdPosts ? response?.data?.createdPosts : [];
-        this.show = "createdPosts";
-      })
-      .catch((err) => {
-        console.log(err);
-        this.userCreatedPosts = [];
-        this.show = "error";
-      })
+      axios
+        .get("http://localhost:5000/api/users/profile/createdPosts", {
+          headers: {
+            Authorization: `Bearer ${this.token}`,
+          },
+        })
+        .then((response) => {
+          console.log(response);
+          this.userCreatedPosts = response?.data?.createdPosts
+            ? response?.data?.createdPosts
+            : [];
+          this.show = "createdPosts";
+        })
+        .catch((err) => {
+          console.log(err);
+          this.userCreatedPosts = [];
+          this.show = "error";
+        });
     },
-    fetchLikedPosts(){
-      this.show = 'loading'
-      axios.get('http://localhost:5000/api/users/profile/likedPosts', {
-        headers: {
-          Authorization: `Bearer ${this.token}`
-        }
-      })
-      .then((response) => {
-        console.log(response)
-        this.userLikedPosts = response?.data?.likedPosts ? response?.data?.likedPosts : []
-        this.show = "likedPosts";
-      })
-      .catch((err) => {
-        console.log(err);
-        this.userLikedPosts = [];
-        this.show = "error";
-      })
+    fetchLikedPosts() {
+      this.show = "loading";
+      axios
+        .get("http://localhost:5000/api/users/profile/likedPosts", {
+          headers: {
+            Authorization: `Bearer ${this.token}`,
+          },
+        })
+        .then((response) => {
+          console.log(response);
+          this.userLikedPosts = response?.data?.likedPosts
+            ? response?.data?.likedPosts
+            : [];
+          this.show = "likedPosts";
+        })
+        .catch((err) => {
+          console.log(err);
+          this.userLikedPosts = [];
+          this.show = "error";
+        });
     },
-    fetchFollowing(){
-      this.show = 'loading'
-      axios.get('http://localhost:5000/api/users/profile/following', {
-        headers: {
-          Authorization: `Bearer ${this.token}`
-        }
-      })
-      .then((response) => {
-        console.log(response)
-        this.userFollowing = response?.data?.following ? response?.data?.following : []
-        this.show = "following";
-      })
-      .catch((err) => {
-        console.log(err);
-        this.userFollowing = [];
-        this.show = "error";
-      })
+    fetchFollowing() {
+      this.show = "loading";
+      axios
+        .get("http://localhost:5000/api/users/profile/following", {
+          headers: {
+            Authorization: `Bearer ${this.token}`,
+          },
+        })
+        .then((response) => {
+          console.log(response);
+          this.userFollowing = response?.data?.following
+            ? response?.data?.following
+            : [];
+          this.show = "following";
+        })
+        .catch((err) => {
+          console.log(err);
+          this.userFollowing = [];
+          this.show = "error";
+        });
     },
     optionChange(option) {
       this.myInfoClass = "";
@@ -306,11 +317,12 @@ export default {
           break;
       }
     },
-    postDeleted(id){
-      console.log("Profile page changing userCreatedpost",id)
-      this.userCreatedPosts = this.userCreatedPosts.filter(t => t._id !== id)
-      this.userLikedPosts = this.userLikedPosts.filter(t => t._id !== id)
-    }
+    postDeleted(id) {
+      console.log("Profile page changing userCreatedpost", id);
+      this.userCreatedPosts = this.userCreatedPosts.filter((t) => t._id !== id);
+      this.userLikedPosts = this.userLikedPosts.filter((t) => t._id !== id);
+      console.log(this.userCreatedPosts);
+    },
   },
 };
 </script>
