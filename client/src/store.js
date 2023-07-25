@@ -10,11 +10,11 @@ const store = createStore({
     },
     mutations: {
         changeLoginStatus(state, newVal){
-            console.log("isLoggedIn => ", newVal);
+            // console.log("isLoggedIn => ", newVal);
             state.loggedIn = newVal;
         },
         updateToken(state, newToken){
-            console.log("setting userToken as => ", newToken);
+            // console.log("setting userToken as => ", newToken);
             state.userToken = newToken;
         },
         updateUser(state, data){

@@ -77,18 +77,17 @@
             src="../assets/edit_design.png"
             class="mx-2"
           />
-          </div>
-          
-          <slot></slot>
         </div>
-      </div>
 
-      <!--  -->
+        <slot></slot>
+      </div>
     </div>
+
+    <!--  -->
+  </div>
   <!-- </div> -->
 </template>
 <script>
-// import PostDetails from './postDetails.vue';
 import axios from 'axios';
 
 export default {
@@ -109,9 +108,17 @@ export default {
   },
   methods: {
     image(url) {
-      const path = require(`../assets/${url}`);
-      return path;
+      console.log("url => ", url);
+      try {
+        console.log("No error here");
+        const path = require(`../assets/${url}`);
+        console.log("path => ", path);
+        return path;
+      } catch (error) {
+        console.log("Error caught");
+      }
     },
+
     async toggleLike() {
       // console.log(this.currentUserId === this.singlePost.author._id)
       // console.log(this.currentUserId, this.singlePost.author._id)
@@ -141,6 +148,8 @@ export default {
     enableEdit() {
       console.log(this.title, this.content);
       this.editContent = true;
+      this.title = this.details.title;
+      this.description = this.details.description;
       setTimeout(() => {
         this.adaptHeight();
         this.$refs.editBox.focus();
@@ -152,13 +161,17 @@ export default {
         if (fromLoc == "textarea") {
           if (this.$refs.editInput != document.activeElement) {
             this.editContent = false;
+            this.details.title = this.title;
+            this.details.description = this.description;
             // api to update the changes to the database
-          } 
+          }
         } else {
           if (this.$refs.editBox != document.activeElement) {
             this.editContent = false;
+            this.details.title = this.title;
+            this.details.description = this.description;
             // api to update the changes to the database
-          } 
+          }
         }
       }, 1);
     },
@@ -227,11 +240,11 @@ export default {
   /* color: red; */
   text-align: justify;
 }
-.actions{
+.actions {
   display: flex-end;
-  align-items: flex-end
+  align-items: flex-end;
 }
-.likeButton{
+.likeButton {
   display: flex;
   justify-content: baseline;
   font-weight: bold;
