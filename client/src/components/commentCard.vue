@@ -3,28 +3,28 @@
     <div class="container">
       <div class="row mb-3">
         <div class="col-1">
-          <img :src="image(comment_data.image_url)" alt="Hello" />
+          <!-- <img :src="image(comment_data.image_url)" alt="Hello" /> -->
         </div>
         <div class="col-10 heading">
           <h5>
-            <span class="userName">{{ comment_data.fullName }} </span><br />
-            <span class="orgName">{{ comment_data.organization }}</span>
+            <span class="userName">{{ authorName }} </span><br />
+            <span class="orgName">{{ authorOrganization }}</span>
           </h5>
         </div>
         <div class="col-1"></div>
       </div>
       <div class="row mb-2">
         <div class="col-1"></div>
-        <div class="col-10" v-if="editContent">
+        <div class="col-10" v-if="editDescription">
           <textarea
             ref="editBox"
             @blur="editCompleted"
             @input="adaptHeight"
             class="editArea"
-            v-model="content"
+            v-model="newDescription"
           />
         </div>
-        <div class="col-10 comment" v-else>{{ content }}</div>
+        <div class="col-10 comment" v-else>{{ description }}</div>
         <div class="col-1"></div>
       </div>
       <div class="row">
@@ -51,7 +51,7 @@
           </div>
           <div class="editButton">
             <img
-            v-if="editContent"
+            v-if="editDescription"
             @click="enableEdit"
             src="../assets/editing_design.png"
             width="24"
@@ -72,18 +72,25 @@
   </div>
 </template>
 <script>
+import axios from 'axios';
+
 export default {
   data() {
     return {
       // Ask for liked status in props object
-      liked: false,
-      editContent: false,
-      content: this.comment_data.comment,
-      likeAmount: this.comment_data.likeAmount,
+      liked: this.comment_data.likedBy.some((id) => id === this.loggedInUserId),
+      editDescription: false,
+      description: this.comment_data.description,
+      newDescription: this.comment_data.description,
+      authorName: this.comment_data?.author?.username ? this.comment_data.author.username : "None",
+      authorOrganization: this.comment_data?.author?.currentEmployeer?.name ? this.comment_data.author.currentEmployeer.name : "None",
+      likeAmount: this.comment_data?.likedBy?.length ? this.comment_data.likedBy.length : 0,
     };
   },
   props: {
     comment_data: Object,
+    token: String,
+    loggedInUserId: String
   },
   
   methods: {
@@ -93,24 +100,54 @@ export default {
       return path;
     },
     toggleLike() {
-      if (!this.liked) {
-        this.likeAmount++;
-      } else {
-        this.likeAmount--;
-      }
-      // update like values in database
       this.liked = !this.liked;
+
+      axios.post(`http://localhost:5000/api/posts/${this.comment_data.linkedToWhichPost}/comment/${this.comment_data._id}/like`, {}, {
+        headers: {
+          Authorization: `Bearer ${this.token}`
+        }
+      })
+      .then((response) => {
+        console.log(response)
+        this.liked = response?.data?.newStatus;
+        this.likeAmount = response?.data?.likeCount;
+      })
+      .catch((err) => {
+        console.log(err)
+        this.liked = !this.liked;
+      })
+      // update like values in database
     },
     
     enableEdit() {
-      this.editContent = true;
+      this.editDescription = true;
       setTimeout(() => {
         this.adaptHeight();
         this.$refs.editBox.focus();
       }, 1);
     },
     editCompleted() {
-      this.editContent = false;
+      this.editDescription = false;
+      if(this.newDescription.trim() === ""){
+        this.newDescription = this.description;
+        return;
+      }
+      axios.post(`http://localhost:5000/api/posts/${this.comment_data.linkedToWhichPost}/comment/${this.comment_data._id}/edit`, {
+        ownerId: this.comment_data.author._id,
+        description: this.newDescription.trim()
+      }, {
+        headers: {
+          Authorization: `Bearer ${this.token}`
+        }
+      })
+      .then((response) => {
+        console.log(response)
+        this.description = this.newDescription;
+      })
+      .catch((err) => {
+        console.log(err)
+        this.liked = !this.liked;
+      })
       // api to update comment in database
     },
     adaptHeight() {

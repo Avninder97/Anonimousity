@@ -200,12 +200,13 @@ export default {
       .then((response) => {
         console.log(response);
         this.userCreatedPosts = response?.data?.createdPosts ? response?.data?.createdPosts : [];
+        this.show = "createdPosts";
       })
       .catch((err) => {
         console.log(err);
         this.userCreatedPosts = [];
+        this.show = "error";
       })
-      this.show = "createdPosts";
     },
     fetchLikedPosts(){
       this.show = 'loading'
@@ -217,12 +218,13 @@ export default {
       .then((response) => {
         console.log(response)
         this.userLikedPosts = response?.data?.likedPosts ? response?.data?.likedPosts : []
+        this.show = "likedPosts";
       })
       .catch((err) => {
         console.log(err);
         this.userLikedPosts = [];
+        this.show = "error";
       })
-      this.show = "likedPosts";
     },
     fetchFollowing(){
       this.show = 'loading'
@@ -234,12 +236,13 @@ export default {
       .then((response) => {
         console.log(response)
         this.userFollowing = response?.data?.following ? response?.data?.following : []
+        this.show = "following";
       })
       .catch((err) => {
         console.log(err);
         this.userFollowing = [];
+        this.show = "error";
       })
-      this.show = "following";
     },
     optionChange(option) {
       this.myInfoClass = "";

@@ -39,6 +39,12 @@ const postControllers = {
             await foundPost.populate('author');
             await foundPost.populate('comments');
             await foundPost.populate('likedBy');
+
+            for(let i=0;i<foundPost.comments.length;i++){
+                await foundPost.comments[i].populate('author');
+                await foundPost.comments[i].author?.populate('currentEmployeer');
+            }
+
             return res.status(200).json({
                 message: "Success",
                 post: foundPost
@@ -288,8 +294,11 @@ const postControllers = {
             })
             foundPost.comments.push(newComment._id);
             await foundPost.save();
+            await newComment.populate('author');
+            await newComment.author.populate('currentEmployeer');
             return res.status(200).json({
-                message: 'Comment added successfully'
+                message: 'Comment added successfully',
+                newComment
             });
         } catch(err) {
             console.log(err)
@@ -303,6 +312,7 @@ const postControllers = {
     likeComment: async (req, res) => {
         try {
             const { cId } = req.params, likedById = req.body.decoded.userId;
+            console.log(cId, likedById);
             const foundComment = await Comment.findOne({ _id: cId });
             if(!foundComment){
                 return res.status(404).json({
@@ -310,18 +320,22 @@ const postControllers = {
                 })
             }
 
+            let newStatus;
             if(foundComment.likedBy.some((uId) => uId.equals(likedById))){
                 inDev && console.log('r')
                 foundComment.likedBy.pull(likedById);
+                newStatus = false;
             }else{
                 inDev && console.log('l')
                 foundComment.likedBy.push(likedById);
+                newStatus = true;
             }
 
             await foundComment.save();
             return res.status(200).json({
                 message: 'success',
-                likeCount: foundComment.likedBy.length
+                likeCount: foundComment.likedBy.length,
+                newStatus
             });
         } catch(err) {
             return res.status(500).json({
