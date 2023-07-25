@@ -50,7 +50,7 @@
     <!--  -->
     <div class="row">
       <div class="col-1"></div>
-      <div class="col-10 actions">
+      <div class="col-9 actions">
         <div class="likeButton">
           <img
             @click="toggleLike()"
@@ -70,6 +70,9 @@
           />
           <span class="me-2">{{ likeAmount }}</span>
         </div>
+        <slot></slot>
+      </div>
+      <div class="col-1">
         <div class="editButton" v-if="currentUserId === singlePost.author._id">
           <img
             v-if="editContent"
@@ -85,9 +88,8 @@
             src="../assets/edit_design.png"
             class="mx-2"
           />
+          <img src="../assets/delete.png" class="mx-2" @click="deletePost()" />
         </div>
-
-        <slot></slot>
       </div>
     </div>
 
@@ -105,6 +107,7 @@ export default {
     currentUserId: String,
     uToken: String,
     handleUpdate: Function,
+    fromPage: String,
   },
   data() {
     return {
@@ -115,8 +118,10 @@ export default {
       liked: this.singlePost?.likedBy?.some((id) => id === this.currentUserId),
       prevTitle: "",
       prevDesc: "",
+      currId: this.singlePost._id,
     };
   },
+  emits: ["postDeleted"],
   methods: {
     image(url) {
       console.log("url => ", url);
@@ -223,11 +228,43 @@ export default {
       myTextarea.style.height = "auto";
       myTextarea.style.height = myTextarea.scrollHeight + "px";
     },
+    deletePost() {
+      const url = `http://localhost:5000/api/posts/${this.currId}/delete`;
+      const ourToken = this.$store.state.userToken;
+      axios
+        .post(
+          url,
+          {
+            ownerId: this.singlePost.author._id,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${ourToken}`,
+            },
+          }
+        )
+        .then((response) => {
+          console.log("message:", response.data.message);
+          // Write an if condition for the component call from postDetails page
+          // If yes use this.$router.back()
+          // else condition written below
+          if (this.fromPage) {
+            this.$router.push({ name: "feedPage" });
+          } else {
+            console.log("Sending to parent:", this.currId);
+            this.$emit("postDeleted", this.currId);
+          }
+        })
+        .catch((err) => {
+          console.log("Error \n", err);
+        });
+    },
   },
-  mounted() {
+  updated() {
     this.likeAmount = this.singlePost.likedBy.length;
     this.description = this.singlePost.description;
     this.title = this.singlePost.title;
+    this.currId = this.singlePost._id;
     this.prevTitle = this.title;
     this.prevDesc = this.description;
   },
@@ -291,5 +328,13 @@ export default {
   display: flex;
   justify-content: baseline;
   font-weight: bold;
+}
+.row .col-1 .editButton {
+  display: flex;
+  width: 100%;
+}
+.row .col-1 .editButton img {
+  min-width: auto;
+  max-width: 28px;
 }
 </style>
