@@ -11,8 +11,8 @@
       <div class="col align-items-center text-center" v-if="isVerified">
         <img src="../assets/verified.png" width="28" /> Verified
       </div>
-      <div v-else>
-        <img src="../assets/unverified.png" width="28"/> Unverified
+      <div class="col align-items-center text-center" v-else>
+        <img src="../assets/unverified.png" width="18"/> Unverified
       </div>
       <div class="col text-end">
         <button class="btn btn-danger" @click="unfollowOrg">Unfollow</button>

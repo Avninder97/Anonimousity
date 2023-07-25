@@ -1,29 +1,57 @@
 <template>
-  <div class="feedBody">
-    <!-- <postCard class="card py-2">
-      <div class="input-group addComments ms-2">
+  <div class="feedBody pt-4">
+      <!-- <div class="input-group addComments ms-2">
         <input type="text" placeholder="Add a Comment" class="inputControl" v-model="newComment"/>
         <span @click="addComment" class="input-group-text arrow" ref="commentArrow">>></span>
+      </div> -->
+    <div v-if="loading" id="spinnerHolder">
+      <div class="spinner-border postLoader" role="status">
+        <span class="visually-hidden">Loading...</span>
       </div>
-    </postCard>
-    <postCard class="card my-2 py-2"></postCard>
-    <postCard class="card my-2 py-2"></postCard>
-    <postCard class="card my-2 py-2"></postCard>
-    <postCard class="card my-2 py-2"></postCard> -->
+    </div>
+    <div v-else-if="error" class="postError">
+      <h1>404 - Posts Not Found</h1>
+    </div>
+    <div v-else>
+        <postCard
+          v-for="(post, index) in posts"
+          :key="index"
+          :singlePost="post"
+          class="py-3 my-4"
+        />
+      </div>
 
-    <h1>hello world</h1>
   </div>
 </template>
 <script>
-// import postCard from './postCard.vue';
+import postCard from './postCard.vue';
+import axios from "axios";
 export default {
   data(){
     return{
-      newComment: ''
+      posts: [],
+      loading: false,
+      error: false
     }
   },
   components:{
-    // postCard,
+    postCard,
+  },
+  beforeMount(){
+    this.loading = true;
+    this.error = false;
+    axios.get('http://localhost:5000/api/posts/')
+    .then((response) => {
+      console.log(response.data.posts);
+      this.posts = response?.data?.posts ? response.data.posts : [];
+      this.loading = false;
+    })
+    .catch((err) => {
+      console.log(err);
+      this.posts = [];
+      this.loading = false;
+      this.error = true;
+    })
   },
   methods:{
     addComment() {

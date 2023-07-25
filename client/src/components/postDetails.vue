@@ -8,7 +8,7 @@
     <h1>404 - Post Not Found</h1>
   </div>
   <div v-else class="postPage">
-    <postCard :singlePost="singlePost" class="sepForComms pb-3 mb-4">
+    <postCard :singlePost="singlePost" class="sepForComms pb-3 mb-4" :uToken="token">
       <div class="input-group addComments ms-2">
         <input
           type="text"
