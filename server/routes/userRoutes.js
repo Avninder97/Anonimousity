@@ -13,6 +13,7 @@ router
     .post(authMiddlewares.validate, userControllers.regenerateKey);
 
 // GET api to fetch all the information of the current logged in user
+// i have included id for future upgrade scope like a minimalistic profile page for viewing other users
 router
     .route('/:id/profile')
     .get(authMiddlewares.validate, userControllers.getUser);

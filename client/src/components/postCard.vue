@@ -16,7 +16,7 @@
       <!-- <hr /> -->
       <div class="row mb-2">
         <div class="col-1"></div>
-        <div class="col-10" v-if="editContent">
+        <div class="col-10" v-if="editContent && currentUserId === singlePost.author._id">
           <input
             type="text"
             class="editTitle"
@@ -62,7 +62,7 @@
             />
             <span class="me-2">{{ likeAmount }}</span>
           </div>
-          <div class="editButton">
+          <div class="editButton" v-if="currentUserId === singlePost.author._id">
             <img
             v-if="editContent"
             @click="enableEdit"
@@ -89,12 +89,14 @@
 </template>
 <script>
 // import PostDetails from './postDetails.vue';
+import axios from 'axios';
 
 export default {
   name: "postCard",
   props: {
     singlePost: Object,
-    editable: Boolean
+    currentUserId: String,
+    uToken: String,
   },
   data() {
     return {
@@ -102,7 +104,7 @@ export default {
       editContent: false,
       content: "",
       title: "",
-      liked: false,
+      liked: this.singlePost?.likedBy?.some((id) => id === this.currentUserId),
     };
   },
   methods: {
@@ -110,17 +112,34 @@ export default {
       const path = require(`../assets/${url}`);
       return path;
     },
-    toggleLike() {
-      if (!this.liked) {
-        this.likeAmount++;
-      } else {
-        this.likeAmount--;
-      }
-      // update like values in database
+    async toggleLike() {
+      // console.log(this.currentUserId === this.singlePost.author._id)
+      // console.log(this.currentUserId, this.singlePost.author._id)
       this.liked = !this.liked;
+      await axios.post(`http://localhost:5000/api/posts/${this.singlePost?._id}/like`, {}, {
+        headers: {
+          Authorization: `Bearer ${this.uToken}`
+        }
+      })
+      .then((response) => {
+        console.log(response)
+        this.liked = response?.data?.newStatus;
+        this.likeAmount = response?.data?.likeCount;
+      })
+      .catch((err) => {
+        console.log(err)
+        this.liked = !this.liked;
+      })
+      // if (!this.liked) {
+      //   this.likeAmount++;
+      // } else {
+      //   this.likeAmount--;
+      // }
+      // // update like values in database
     },
 
     enableEdit() {
+      console.log(this.title, this.content);
       this.editContent = true;
       setTimeout(() => {
         this.adaptHeight();

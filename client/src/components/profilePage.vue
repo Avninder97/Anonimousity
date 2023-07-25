@@ -92,12 +92,12 @@
 
       <!-- Created Posts -->
       <div v-if="show === 'createdPosts'">
-        <postCard v-for="(post, index) in userData.createdPosts" :key="index" :singlePost="post" class="pb-4" :editable="true"/>
+        <postCard v-for="(post, index) in userData.createdPosts" :key="index" :singlePost="post" class="pb-4" :currentUserId="loggedInUserId" :uToken="token"/>
       </div>
 
       <!-- Liked Posts -->
       <div v-if="show === 'likedPosts'">
-        <postCard v-for="(post, index) in userData.likedPosts" :key="index" :singlePost="post" class="pb-4" :editable="false"/>
+        <postCard v-for="(post, index) in userData.likedPosts" :key="index" :singlePost="post" class="pb-4" :currentUserId="loggedInUserId" :uToken="token"/>
       </div>
 
     </div>
@@ -123,6 +123,8 @@ export default {
       privateKeyClass: "profilePageOptions",
       show: "loading",
       ConfirmationBox: false,
+      loggedInUserId: "",
+      token: "",
     };
   },
   components: {
@@ -151,8 +153,18 @@ export default {
         ourToken.trim();
       }
     });
+    this.token = ourToken;
+    let payload = ourToken.split('.')[1];
+    payload = payload.replace(/-/g, '+').replace(/_/g, '/');
+    payload = decodeURIComponent(window.atob(payload).split('').map(function(c) {
+      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+    payload = JSON.parse(payload);
+    console.log(payload.userId);
+    this.loggedInUserId = payload.userId;
+
     console.log("userToken => ", this.$store.state.userToken);
-    axios.get(`http://localhost:5000/api/users/64b0d9363b6fc6b67df002e7/profile`, {
+    axios.get(`http://localhost:5000/api/users/anythingWorkHere/profile`, {
       headers: {
         Authorization: `Bearer ${ourToken}`
       }

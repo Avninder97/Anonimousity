@@ -233,6 +233,7 @@ const postControllers = {
             const userId = decoded.userId;
             const foundPost = await Post.findOne({ _id: id });
             const foundUser = await User.findOne({ _id: userId });
+            let newStatus;
 
             if(!foundPost || !foundUser){
                 return res.status(404).json({
@@ -244,10 +245,12 @@ const postControllers = {
                 inDev && console.log('r')
                 foundUser.likedPosts.pull(id);
                 foundPost.likedBy.pull(userId);
+                newStatus = false;
             }else{
                 inDev && console.log('l')
                 foundUser.likedPosts.push(id);
                 foundPost.likedBy.push(userId);
+                newStatus = true;
             }
 
             await foundPost.save();
@@ -255,7 +258,8 @@ const postControllers = {
             
             return res.status(200).json({
                 message: "success",
-                likeCount: foundPost.likedBy.length
+                likeCount: foundPost.likedBy.length,
+                newStatus: newStatus
             });
         } catch(err) {
             console.log(err);
