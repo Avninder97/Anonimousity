@@ -1,69 +1,77 @@
 <template>
   <!-- <div class="postbody"> -->
-    <div class="container postcard">
-      <div class="row postHead mb-3 pb-1" style="border-bottom: 1px dotted rgb(240,234,234, 0.5);">
-        <div class="col-1">
-          <!-- <img :src="image(singlePost.author.profile_pic)" alt="Hello" /> -->
-        </div>
+  <div class="container postcard">
+    <div
+      class="row postHead mb-3 pb-1"
+      style="border-bottom: 1px dotted rgb(240, 234, 234, 0.5)"
+    >
+      <div class="col-1">
+        <!-- <img :src="image(singlePost.author.profile_pic)" alt="Hello" /> -->
+      </div>
 
-        <div class="col-10 heading p-0">
-          <h5>
-            <span class="userName">{{ singlePost.author.username }} </span><br/>
-            <span class="orgName">{{ singlePost.organization ? singlePost.organization.name : "" }}</span>
-          </h5>
-        </div>
+      <div class="col-10 heading p-0">
+        <h5>
+          <span class="userName">{{ singlePost.author.username }} </span><br />
+          <span class="orgName">{{
+            singlePost.organization ? singlePost.organization.name : ""
+          }}</span>
+        </h5>
       </div>
-      <!-- <hr /> -->
-      <div class="row mb-2">
-        <div class="col-1"></div>
-        <div class="col-10" v-if="editContent && currentUserId === singlePost.author._id">
-          <input
-            type="text"
-            class="editTitle"
-            ref="editInput"
-            @blur="editCompleted('input')"
-            v-model="title"
-          />
-          <textarea
-            v-model="content"
-            ref="editBox"
-            @blur="editCompleted('textarea')"
-            @input="adaptHeight"
-            class="editArea"
-          />
-        </div>
-        <div class="col-10" v-else>
-          <p style="text-align: justify;">
-            <span class="postTitle">{{ singlePost.title }} </span><br />
-            <span class="postContent">{{ singlePost.description }}</span>
-          </p>
-        </div>
+    </div>
+    <!-- <hr /> -->
+    <div class="row mb-2">
+      <div class="col-1"></div>
+      <div
+        class="col-10"
+        v-if="editContent && currentUserId === singlePost.author._id"
+      >
+        <input
+          type="text"
+          class="editTitle"
+          ref="editInput"
+          @blur="editCompleted('input')"
+          v-model="title"
+        />
+        <textarea
+          v-model="description"
+          ref="editBox"
+          @blur="editCompleted('textarea')"
+          @input="adaptHeight"
+          class="editArea"
+        />
       </div>
-      <!--  -->
-      <div class="row">
-        <div class="col-1"></div>
-        <div class="col-10 actions">
-          <div class="likeButton">
-            <img
-              @click="toggleLike()"
-              v-if="liked"
-              src="../assets/liked_design.png"
-              alt=" "
-              width="24"
-              class="mx-2"
-            />
-            <img
-              @click="toggleLike()"
-              v-else
-              src="../assets/design.png"
-              width="24"
-              alt="like"
-              class="mx-2"
-            />
-            <span class="me-2">{{ likeAmount }}</span>
-          </div>
-          <div class="editButton" v-if="currentUserId === singlePost.author._id">
-            <img
+      <div class="col-10" v-else>
+        <p style="text-align: justify">
+          <span class="postTitle">{{ title }} </span><br />
+          <span class="postContent">{{ description }}</span>
+        </p>
+      </div>
+    </div>
+    <!--  -->
+    <div class="row">
+      <div class="col-1"></div>
+      <div class="col-10 actions">
+        <div class="likeButton">
+          <img
+            @click="toggleLike()"
+            v-if="liked"
+            src="../assets/liked_design.png"
+            alt=" "
+            width="24"
+            class="mx-2"
+          />
+          <img
+            @click="toggleLike()"
+            v-else
+            src="../assets/design.png"
+            width="24"
+            alt="like"
+            class="mx-2"
+          />
+          <span class="me-2">{{ likeAmount }}</span>
+        </div>
+        <div class="editButton" v-if="currentUserId === singlePost.author._id">
+          <img
             v-if="editContent"
             @click="enableEdit"
             src="../assets/editing_design.png"
@@ -88,7 +96,7 @@
   <!-- </div> -->
 </template>
 <script>
-import axios from 'axios';
+import axios from "axios";
 
 export default {
   name: "postCard",
@@ -96,15 +104,17 @@ export default {
     singlePost: Object,
     currentUserId: String,
     uToken: String,
-    handleUpdate: Function
+    handleUpdate: Function,
   },
   data() {
     return {
       likeAmount: this.singlePost.likedBy.length,
       editContent: false,
-      content: "",
-      title: "",
+      description: this.singlePost.description,
+      title: this.singlePost.title,
       liked: this.singlePost?.likedBy?.some((id) => id === this.currentUserId),
+      prevTitle: "",
+      prevDesc: "",
     };
   },
   methods: {
@@ -121,43 +131,64 @@ export default {
     },
 
     async toggleLike() {
-      // console.log(this.currentUserId === this.singlePost.author._id)
-      // console.log(this.currentUserId, this.singlePost.author._id)
       this.liked = !this.liked;
-      await axios.post(`http://localhost:5000/api/posts/${this.singlePost?._id}/like`, {}, {
-        headers: {
-          Authorization: `Bearer ${this.uToken}`
-        }
-      })
-      .then((response) => {
-        console.log(response)
-        this.liked = response?.data?.newStatus;
-        this.likeAmount = response?.data?.likeCount;
-        if(this.handleUpdate){
-          this.handleUpdate()
-        }
-      })
-      .catch((err) => {
-        console.log(err)
-        this.liked = !this.liked;
-      })
-      // if (!this.liked) {
-      //   this.likeAmount++;
-      // } else {
-      //   this.likeAmount--;
-      // }
-      // // update like values in database
+      await axios
+        .post(
+          `http://localhost:5000/api/posts/${this.singlePost?._id}/like`,
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${this.uToken}`,
+            },
+          }
+        )
+        .then((response) => {
+          console.log(response);
+          this.liked = response?.data?.newStatus;
+          this.likeAmount = response?.data?.likeCount;
+          if (this.handleUpdate) {
+            this.handleUpdate();
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+          this.liked = !this.liked;
+        });
     },
 
     enableEdit() {
-      console.log(this.title, this.content);
+      console.log(this.title, this.description);
       this.editContent = true;
-      this.title = this.details.title;
-      this.description = this.details.description;
       setTimeout(() => {
         this.adaptHeight();
         this.$refs.editBox.focus();
       }, 0.5);
+    },
+    editPostAPI() {
+      this.prevTitle = this.title;
+      this.prevDesc = this.description;
+      const url = `http://localhost:5000/api/posts/${this.singlePost._id}/edit`;
+      const ourToken = this.$store.state.userToken;
+      axios
+        .post(
+          url,
+          {
+            title: this.title,
+            description: this.description,
+            ownerId: this.singlePost.author._id,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${ourToken}`,
+            },
+          }
+        )
+        .then((response) => {
+          console.log("message:", response.data.message);
+        })
+        .catch((err) => {
+          console.log("Error \n", err);
+        });
     },
 
     editCompleted(fromLoc) {
@@ -165,16 +196,24 @@ export default {
         if (fromLoc == "textarea") {
           if (this.$refs.editInput != document.activeElement) {
             this.editContent = false;
-            this.details.title = this.title;
-            this.details.description = this.description;
-            // api to update the changes to the database
+            // api call to update the changes to the database
+            if (this.title.trim() && this.description.trim()) {
+              this.editPostAPI();
+            } else {
+              this.title = this.prevTitle;
+              this.description = this.prevDesc;
+            }
           }
         } else {
           if (this.$refs.editBox != document.activeElement) {
             this.editContent = false;
-            this.details.title = this.title;
-            this.details.description = this.description;
-            // api to update the changes to the database
+            // api call to update the changes to the database
+            if (this.title.trim() && this.description.trim()) {
+              this.editPostAPI();
+            } else {
+              this.title = this.prevTitle;
+              this.description = this.prevDesc;
+            }
           }
         }
       }, 1);
@@ -187,8 +226,10 @@ export default {
   },
   mounted() {
     this.likeAmount = this.singlePost.likedBy.length;
-    this.content = this.singlePost.description;
+    this.description = this.singlePost.description;
     this.title = this.singlePost.title;
+    this.prevTitle = this.title;
+    this.prevDesc = this.description;
   },
 };
 </script>
@@ -199,7 +240,6 @@ export default {
 }
 .postcard {
   border-radius: 25px;
-  /* padding: 10px 20px; */
   border: 2px solid red;
   margin: 2rem auto;
 }
@@ -241,7 +281,6 @@ export default {
 }
 .postContent {
   font-size: medium;
-  /* color: red; */
   text-align: justify;
 }
 .actions {
@@ -252,6 +291,5 @@ export default {
   display: flex;
   justify-content: baseline;
   font-weight: bold;
-  /* align-items: center; */
 }
 </style>
