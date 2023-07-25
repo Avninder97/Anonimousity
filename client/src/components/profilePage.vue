@@ -88,16 +88,18 @@
       />
 
       <!-- Following page -->
-      <followingComp v-show="show === 'following'"/>
+      <div v-if="show === 'following'">
+        <followingComp v-for="(organization, index) in userFollowing" :key="index" :singleOrganization="organization" :currentUserId="loggedInUserId" :uToken="token"/>
+      </div>
 
       <!-- Created Posts -->
       <div v-if="show === 'createdPosts'">
-        <postCard v-for="(post, index) in userData.createdPosts" :key="index" :singlePost="post" class="pb-4" :currentUserId="loggedInUserId" :uToken="token"/>
+        <postCard v-for="(post, index) in userCreatedPosts" :key="index" :singlePost="post" class="pb-4" :currentUserId="loggedInUserId" :uToken="token" :handleUpdate="fetchCreatedPosts"/>
       </div>
 
       <!-- Liked Posts -->
       <div v-if="show === 'likedPosts'">
-        <postCard v-for="(post, index) in userData.likedPosts" :key="index" :singlePost="post" class="pb-4" :currentUserId="loggedInUserId" :uToken="token"/>
+        <postCard v-for="(post, index) in userLikedPosts" :key="index" :singlePost="post" class="pb-4" :currentUserId="loggedInUserId" :uToken="token" :handleUpdate="fetchLikedPosts"/>
       </div>
 
     </div>
@@ -125,6 +127,9 @@ export default {
       ConfirmationBox: false,
       loggedInUserId: "",
       token: "",
+      userLikedPosts: [],
+      userCreatedPosts: [],
+      userFollowing: []
     };
   },
   components: {
@@ -184,6 +189,58 @@ export default {
       const path = require(`../assets/${url}`);
       return path;
     },
+    fetchCreatedPosts(){
+      this.show = 'loading'
+      console.log(this.token);
+      axios.get('http://localhost:5000/api/users/profile/createdPosts', {
+        headers: {
+          Authorization: `Bearer ${this.token}`
+        }
+      })
+      .then((response) => {
+        console.log(response);
+        this.userCreatedPosts = response?.data?.createdPosts ? response?.data?.createdPosts : [];
+      })
+      .catch((err) => {
+        console.log(err);
+        this.userCreatedPosts = [];
+      })
+      this.show = "createdPosts";
+    },
+    fetchLikedPosts(){
+      this.show = 'loading'
+      axios.get('http://localhost:5000/api/users/profile/likedPosts', {
+        headers: {
+          Authorization: `Bearer ${this.token}`
+        }
+      })
+      .then((response) => {
+        console.log(response)
+        this.userLikedPosts = response?.data?.likedPosts ? response?.data?.likedPosts : []
+      })
+      .catch((err) => {
+        console.log(err);
+        this.userLikedPosts = [];
+      })
+      this.show = "likedPosts";
+    },
+    fetchFollowing(){
+      this.show = 'loading'
+      axios.get('http://localhost:5000/api/users/profile/following', {
+        headers: {
+          Authorization: `Bearer ${this.token}`
+        }
+      })
+      .then((response) => {
+        console.log(response)
+        this.userFollowing = response?.data?.following ? response?.data?.following : []
+      })
+      .catch((err) => {
+        console.log(err);
+        this.userFollowing = [];
+      })
+      this.show = "following";
+    },
     optionChange(option) {
       this.myInfoClass = "";
       this.postsClass = "";
@@ -198,15 +255,15 @@ export default {
           break;
         case "p":
           this.postsClass = "selectedOption";
-          this.show = "createdPosts";
+          this.fetchCreatedPosts();
           break;
         case "l":
           this.likedClass = "selectedOption";
-          this.show = "likedPosts";
+          this.fetchLikedPosts();
           break;
         case "f":
+          this.fetchFollowing();
           this.followingClass = "selectedOption";
-          this.show = "following";
           break;
         case "k":
           this.privateKeyClass = "selectedOption";

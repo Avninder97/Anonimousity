@@ -11,7 +11,7 @@ import orgProfile from './components/orgProfile.vue'
 const routes = [
     {
         name: "profilePage",
-        path: '/profile/:userId',
+        path: '/profile',
         component: profilePage
     },
     {

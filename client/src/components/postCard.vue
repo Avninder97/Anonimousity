@@ -96,6 +96,7 @@ export default {
     singlePost: Object,
     currentUserId: String,
     uToken: String,
+    handleUpdate: Function
   },
   data() {
     return {
@@ -132,6 +133,9 @@ export default {
         console.log(response)
         this.liked = response?.data?.newStatus;
         this.likeAmount = response?.data?.likeCount;
+        if(this.handleUpdate){
+          this.handleUpdate()
+        }
       })
       .catch((err) => {
         console.log(err)

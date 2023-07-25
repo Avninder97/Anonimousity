@@ -5,7 +5,7 @@ const bcrypt = require('bcrypt');
 let inDev = process.env.INDEVMODE;
 
 const userControllers = {
-    // For profile (private route)
+    // For profile (private route), basic data
     getUser: async (req, res) => {
         try {
             const id = req.body.decoded.userId
@@ -17,21 +17,8 @@ const userControllers = {
             }
 
             inDev && console.log(foundUser);
-            foundUser = await foundUser.populate('createdPosts');
-            foundUser = await foundUser.populate('likedPosts');
-            foundUser = await foundUser.populate('following');
             foundUser = await foundUser.populate('pastEmployeers');
             foundUser = await foundUser.populate('currentEmployeer');
-
-            // Needs improvement in structure (hold for version 2)
-            for(let i=0;i<foundUser.createdPosts.length;i++){
-                await foundUser.createdPosts[i].populate('author');
-                await foundUser.createdPosts[i].populate('organization');
-            }
-            for(let i=0;i<foundUser.likedPosts.length;i++){
-                await foundUser.likedPosts[i].populate('author');
-                await foundUser.likedPosts[i].populate('organization');
-            }
 
             inDev && console.log(foundUser);
 
@@ -126,6 +113,94 @@ const userControllers = {
             })
         } catch(err) {
             inDev && console.log(err)
+            return res.status(500).json({
+                message: "Server Error"
+            })
+        }
+    },
+
+    getLikedPosts: async (req, res) => {
+        try {
+            const id = req.body.decoded.userId
+            let foundUser = await User.findOne({ _id: id });
+            if(!foundUser){
+                return res.status(404).json({
+                    message: "User not found"
+                })
+            }
+
+            inDev && console.log(foundUser);
+            foundUser = await foundUser.populate('likedPosts');
+
+            for(let i=0;i<foundUser.likedPosts.length;i++){
+                await foundUser.likedPosts[i].populate('author');
+                await foundUser.likedPosts[i].populate('organization');
+            }
+
+            return res.status(200).json({
+                message: "Success",
+                likedPosts: foundUser.likedPosts
+            })
+
+        } catch(err) {
+            inDev && console.log(err);
+            return res.status(500).json({
+                message: "Server Error"
+            })
+        }
+    },
+
+    getCreatedPosts: async (req, res) => {
+        try {
+            const id = req.body.decoded.userId
+            let foundUser = await User.findOne({ _id: id });
+            if(!foundUser){
+                return res.status(404).json({
+                    message: "User not found"
+                })
+            }
+
+            inDev && console.log(foundUser);
+            foundUser = await foundUser.populate('createdPosts');
+
+            for(let i=0;i<foundUser.createdPosts.length;i++){
+                await foundUser.createdPosts[i].populate('author');
+                await foundUser.createdPosts[i].populate('organization');
+            }
+
+            return res.status(200).json({
+                message: "Success",
+                createdPosts: foundUser.createdPosts
+            })
+
+        } catch(err) {
+            inDev && console.log(err);
+            return res.status(500).json({
+                message: "Server Error"
+            })
+        }
+    },
+
+    getfollowing: async (req, res) => {
+        try {
+            const id = req.body.decoded.userId
+            let foundUser = await User.findOne({ _id: id });
+            if(!foundUser){
+                return res.status(404).json({
+                    message: "User not found"
+                })
+            }
+
+            inDev && console.log(foundUser);
+            foundUser = await foundUser.populate('following');
+
+            return res.status(200).json({
+                message: "Success",
+                following: foundUser.following
+            });
+
+        } catch(err) {
+            inDev && console.log(err);
             return res.status(500).json({
                 message: "Server Error"
             })

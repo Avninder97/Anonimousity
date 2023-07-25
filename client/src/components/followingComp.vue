@@ -19,7 +19,12 @@
 </template>
 <script>
 export default {
-  name: "myInfoProfile",
+  name: "followingCompanies",
+  props: {
+    singleOrganization: Object,
+    currentUserId: String,
+    uToken: String
+  },
   data() {
     return {};
   },
