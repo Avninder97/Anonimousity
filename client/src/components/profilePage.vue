@@ -54,7 +54,6 @@
     </div>
     <!-- Check-Mode -->
     <div class="col-10 selected_data">
-
       <!-- Loader -->
       <div id="spinnerHolder" v-if="show === 'loading'">
         <div class="spinner-border profileLoader">
@@ -64,9 +63,7 @@
 
       <!-- Error page -->
       <div v-if="show === 'error'">
-        <h1>
-          An Error Occured :(
-        </h1>
+        <h1>An Error Occured :(</h1>
       </div>
 
       <!-- Change Avatar -->
@@ -76,8 +73,7 @@
       />
 
       <!-- Profile info page -->
-      <myInfoProfile v-if="show === 'myInfo'" :user="userData"/>
-
+      <myInfoProfile v-if="show === 'myInfo'" :user="userData" />
 
       <!-- While using privateKey component, keep props and emits being used in mind -->
       <privateKey
@@ -89,19 +85,41 @@
 
       <!-- Following page -->
       <div v-if="show === 'following'">
-        <followingComp v-for="(organization, index) in userFollowing" :key="index" :singleOrganization="organization" :currentUserId="loggedInUserId" :uToken="token"/>
+        <followingComp
+          v-for="(organization, index) in userFollowing"
+          :key="index"
+          :singleOrganization="organization"
+          :currentUserId="loggedInUserId"
+          :uToken="token"
+        />
       </div>
 
       <!-- Created Posts -->
       <div v-if="show === 'createdPosts'">
-        <postCard v-for="(post, index) in userCreatedPosts" :key="index" :singlePost="post" class="pb-4" :currentUserId="loggedInUserId" :uToken="token" :handleUpdate="fetchCreatedPosts"/>
+        <postCard
+          v-for="(post, index) in userCreatedPosts"
+          :key="index"
+          :singlePost="post"
+          class="pb-4"
+          :currentUserId="loggedInUserId"
+          :uToken="token"
+          :handleUpdate="fetchCreatedPosts"
+          @postDeleted="(id) => postDeleted(id)"
+        />
       </div>
 
       <!-- Liked Posts -->
       <div v-if="show === 'likedPosts'">
-        <postCard v-for="(post, index) in userLikedPosts" :key="index" :singlePost="post" class="pb-4" :currentUserId="loggedInUserId" :uToken="token" :handleUpdate="fetchLikedPosts"/>
+        <postCard
+          v-for="(post, index) in userLikedPosts"
+          :key="index"
+          :singlePost="post"
+          class="pb-4"
+          :currentUserId="loggedInUserId"
+          :uToken="token"
+          :handleUpdate="fetchLikedPosts"
+        />
       </div>
-
     </div>
   </div>
 </template>
@@ -111,7 +129,7 @@ import myInfoProfile from "./myInfoProfile.vue";
 import postCard from "./postCard.vue";
 import changeAvatar from "./changeAvatar.vue";
 import privateKey from "./privateKey.vue";
-import followingComp from "./followingComp"
+import followingComp from "./followingComp";
 
 export default {
   name: "profilePage",
@@ -129,7 +147,7 @@ export default {
       token: "",
       userLikedPosts: [],
       userCreatedPosts: [],
-      userFollowing: []
+      userFollowing: [],
     };
   },
   components: {
@@ -137,60 +155,67 @@ export default {
     myInfoProfile,
     changeAvatar,
     privateKey,
-    followingComp
+    followingComp,
   },
-  beforeMount(){
+  beforeMount() {
     // this.loading = true;
-    this.show = 'loading';
-    if (document.cookie.indexOf('token') === -1) {
-      console.log('Cookie not found.');
-      this.$store.commit('changeLoginStatus', false);
-      this.$store.commit('updateToken', null);
+    this.show = "loading";
+    if (document.cookie.indexOf("token") === -1) {
+      console.log("Cookie not found.");
+      this.$store.commit("changeLoginStatus", false);
+      this.$store.commit("updateToken", null);
       this.loading = false;
-      this.$router.push({name: 'loginPage'});
+      this.$router.push({ name: "loginPage" });
     }
 
-    const cookiesArray = document.cookie.split(';');
+    const cookiesArray = document.cookie.split(";");
     let ourToken = "";
     cookiesArray.map((cString) => {
-      if(cString.split('=')[0] === 'token'){
-        ourToken = cString.split('=')[1];
+      if (cString.split("=")[0] === "token") {
+        ourToken = cString.split("=")[1];
         ourToken.trim();
       }
     });
     this.token = ourToken;
-    let payload = ourToken.split('.')[1];
-    payload = payload.replace(/-/g, '+').replace(/_/g, '/');
-    payload = decodeURIComponent(window.atob(payload).split('').map(function(c) {
-      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-    }).join(''));
+    let payload = ourToken.split(".")[1];
+    payload = payload.replace(/-/g, "+").replace(/_/g, "/");
+    payload = decodeURIComponent(
+      window
+        .atob(payload)
+        .split("")
+        .map(function (c) {
+          return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
+        })
+        .join("")
+    );
     payload = JSON.parse(payload);
     console.log(payload.userId);
     this.loggedInUserId = payload.userId;
 
     console.log("userToken => ", this.$store.state.userToken);
-    axios.get(`http://localhost:5000/api/users/anythingWorkHere/profile`, {
-      headers: {
-        Authorization: `Bearer ${ourToken}`
-      }
-    })
-    .then((response) => {
-      // console.log(response.data.user);
-      this.userData = response.data.user;
-      this.show = 'myInfo';
-    })
-    .catch((err) => {
-      console.log(err);
-      this.show = 'error'
-    })
+    axios
+      .get(`http://localhost:5000/api/users/anythingWorkHere/profile`, {
+        headers: {
+          Authorization: `Bearer ${ourToken}`,
+        },
+      })
+      .then((response) => {
+        // console.log(response.data.user);
+        this.userData = response.data.user;
+        this.show = "myInfo";
+      })
+      .catch((err) => {
+        console.log(err);
+        this.show = "error";
+      });
   },
   methods: {
     image(url) {
       const path = require(`../assets/${url}`);
       return path;
     },
-    fetchCreatedPosts(){
-      this.show = 'loading'
+    fetchCreatedPosts() {
+      this.show = "loading";
       console.log(this.token);
       axios.get('http://localhost:5000/api/users/profile/createdPosts', {
         headers: {
@@ -281,6 +306,11 @@ export default {
           break;
       }
     },
+    postDeleted(id){
+      console.log("Profile page changing userCreatedpost",id)
+      this.userCreatedPosts = this.userCreatedPosts.filter(t => t._id !== id)
+      this.userLikedPosts = this.userLikedPosts.filter(t => t._id !== id)
+    }
   },
 };
 </script>
@@ -350,6 +380,7 @@ export default {
   background: #818a8f;
   border-radius: 17px;
 }
+
 .profile_image ul {
   text-align: center;
   border-radius: 30px;
@@ -378,5 +409,4 @@ export default {
   /* border: 2px white solid; */
   /* height: 100%; */
 }
-
 </style>
