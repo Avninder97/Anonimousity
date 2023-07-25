@@ -24,7 +24,7 @@ export default {
     // else delete it from frontend
 
     if (document.cookie.indexOf('token') === -1) {
-      console.log('Cookie not found.');
+      // console.log('Cookie not found.');
       this.$store.commit('changeLoginStatus', false);
       this.$store.commit('updateToken', null);
       return;
@@ -44,9 +44,9 @@ export default {
         Authorization: `Bearer ${ourToken}`
       }
     })
-    .then((response) => {
-      console.log(response);
-      console.log("Already Logged In");
+    .then(() => {
+      // console.log(response);
+      // console.log("Already Logged In");
       this.$store.commit('changeLoginStatus', true);
       this.$store.commit('updateToken', ourToken);
 
@@ -58,7 +58,7 @@ export default {
       
       // Set the cookie with the updated expiration date
       document.cookie = "token=; expires=" + expirationDate.toUTCString() + "; path=/";
-      console.log("cookie deleted");
+      // console.log("cookie deleted");
       this.$store.commit('changeLoginStatus', false);
       this.$store.commit('updateToken', null);
     })

@@ -1,9 +1,19 @@
 <template>
   <div class="postPage">
-    <postCard class="sepForComms pb-3 mb-4">
+    <postCard :postDetail="postDetails" class="sepForComms pb-3 mb-4">
       <div class="input-group addComments ms-2">
-        <input type="text" placeholder="Add a Comment" class="inputControl" v-model="newComment"/>
-        <span @click="addComment" class="input-group-text arrow" ref="commentArrow">>></span>
+        <input
+          type="text"
+          placeholder="Add a Comment"
+          class="inputControl"
+          v-model="newComment"
+        />
+        <span
+          @click="addComment"
+          class="input-group-text arrow"
+          ref="commentArrow"
+          >>></span
+        >
       </div>
     </postCard>
     <!-- Put a v-for loop for comments gathered from database -->
@@ -12,17 +22,26 @@
       <commentCard :comment_data="commentObject" />
       <commentCard :comment_data="commentObject" />
     </div>
-    
   </div>
 </template>
 <script>
 import postCard from "./postCard.vue";
 import commentCard from "./commentCard.vue";
+import axios from "axios";
 
 export default {
-  name: "postDetail",
+  name: "postDetails",
   data() {
     return {
+      postId: "",
+      postDetails: {
+        username: '',
+        profile_pic: '',
+        name: '',
+        title: '',
+        description: '',
+        likeCount:''
+      },
       commentObject: {
         fullName: "Prateek Kumar",
         organization: "Argusoft",
@@ -31,7 +50,7 @@ export default {
         image_url: "b1.png",
         likeAmount: 1500,
       },
-      newComment:'',
+      newComment: "",
     };
   },
   components: {
@@ -40,14 +59,46 @@ export default {
   },
   methods: {
     addComment() {
-      if(this.newComment)
-      {const arrow = this.$refs.commentArrow;
-      arrow.style.color = 'green'
-      setTimeout(()=>{
-        arrow.style.color = 'rgb(240, 234, 234)'
-      },500)
-      this.newComment = ''}
+      if (this.newComment) {
+        const arrow = this.$refs.commentArrow;
+        arrow.style.color = "green";
+        setTimeout(() => {
+          arrow.style.color = "rgb(240, 234, 234)";
+        }, 500);
+        this.newComment = "";
+      }
     },
+  },
+  mounted() {
+    // get post id from parameter using this.$route.params.postId
+    console.log(this.$route.params.postId);
+    if (this.$route.params.postId) {
+      const postId = this.$route.params.postId;
+      const url = `http://localhost:5000/api/posts/${postId}`;
+      const ourToken = this.$store.state.userToken;
+      axios
+        .get(url, {
+          headers: {
+            Authorization: `Bearer ${ourToken}`,
+          },
+        })
+        .then((response) => {
+          // console.log("message:", response.data.message);
+          if (response.data.message === "Success") {
+            console.log(response.data.post);
+            this.postDetails.username = response.data.post.author.username
+            this.postDetails.profile_pic = response.data.post.author.profile_pic
+            this.postDetails.name = response.data.post.organization.name
+            this.postDetails.title = response.data.post.title
+            this.postDetails.description = response.data.post.description
+            this.postDetails.likeCount = response.data.post.likedBy.length
+            // this.postDetails = { ...response.data.post };
+          }
+        })
+        .catch((err) => {
+          console.log("Error \n", err);
+        });
+    }
   },
 };
 </script>
@@ -56,11 +107,9 @@ export default {
   max-width: 1000px;
   margin: 0 auto;
 }
-/* .sepForComms {
-  border: none;
-  border-bottom: 1.5px solid rgb(240, 234, 234);
-  border-radius: 0px 0px 3% 3%;
-} */
+.sepForComms {
+  margin-top: 4rem;
+}
 .addComments {
   display: flex;
   align-items: center;

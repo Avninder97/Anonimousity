@@ -1,69 +1,72 @@
 <template>
   <!-- <div class="postbody"> -->
-    <div class="container postcard">
-      <div class="row postHead mb-3 pb-1" style="border-bottom: 1px dotted rgb(240,234,234, 0.5);">
-        <div class="col-1">
-          <img :src="image(postDetail.image_url)" alt="Hello" />
-        </div>
+  <div class="container postcard">
+    <div
+      class="row postHead mb-3 pb-1"
+      style="border-bottom: 1px dotted rgb(240, 234, 234, 0.5)"
+    >
+      <div class="col-1">
+        <img :src="image(details.profile_pic)" alt="Hello" />
+      </div>
 
-        <div class="col-10 heading p-0">
-          <h5>
-            <span class="userName">{{ postDetail.postMaker }} </span><br />
-            <span class="orgName">{{ postDetail.postOrg }}</span>
-          </h5>
-        </div>
+      <div class="col-10 heading p-0">
+        <h5>
+          <span class="userName">{{ details.username }} </span><br />
+          <span class="orgName">{{ details.name }}</span>
+        </h5>
       </div>
-      <!-- <hr /> -->
-      <div class="row mb-2">
-        <div class="col-1"></div>
-        <div class="col-10" v-if="editContent">
-          <input
-            type="text"
-            class="editTitle"
-            ref="editInput"
-            @blur="editCompleted('input')"
-            v-model="title"
-          />
-          <textarea
-            v-model="content"
-            ref="editBox"
-            @blur="editCompleted('textarea')"
-            @input="adaptHeight"
-            class="editArea"
-          />
-        </div>
-        <div class="col-10" v-else>
-          <p style="text-align: justify;">
-            <span class="postTitle">{{ title }} </span><br />
-            <span class="postContent">{{ content }}</span>
-          </p>
-        </div>
+    </div>
+    <!-- <hr /> -->
+    <div class="row mb-2">
+      <div class="col-1"></div>
+      <div class="col-10" v-if="editContent">
+        <input
+          type="text"
+          class="editTitle"
+          ref="editInput"
+          @blur="editCompleted('input')"
+          v-model="title"
+        />
+        <textarea
+          v-model="description"
+          ref="editBox"
+          @blur="editCompleted('textarea')"
+          @input="adaptHeight"
+          class="editArea"
+        />
       </div>
-      <!--  -->
-      <div class="row">
-        <div class="col-1"></div>
-        <div class="col-10 actions">
-          <div class="likeButton">
-            <img
-              @click="toggleLike()"
-              v-if="liked"
-              src="../assets/liked_design.png"
-              alt=" "
-              width="24"
-              class="mx-2"
-            />
-            <img
-              @click="toggleLike()"
-              v-else
-              src="../assets/design.png"
-              width="24"
-              alt="like"
-              class="mx-2"
-            />
-            <span class="me-2">{{ likeAmount }}</span>
-          </div>
-          <div class="editButton">
-            <img
+      <div class="col-10" v-else>
+        <p style="text-align: justify">
+          <span class="postTitle">{{ details.title }} </span><br />
+          <span class="postContent">{{ details.description }}</span>
+        </p>
+      </div>
+    </div>
+    <!--  -->
+    <div class="row">
+      <div class="col-1"></div>
+      <div class="col-10 actions">
+        <div class="likeButton">
+          <img
+            @click="toggleLike()"
+            v-if="liked"
+            src="../assets/liked_design.png"
+            alt=" "
+            width="24"
+            class="mx-2"
+          />
+          <img
+            @click="toggleLike()"
+            v-else
+            src="../assets/design.png"
+            width="24"
+            alt="like"
+            class="mx-2"
+          />
+          <span class="me-2">{{ details.likeCount }}</span>
+        </div>
+        <div class="editButton">
+          <img
             v-if="editContent"
             @click="enableEdit"
             src="../assets/editing_design.png"
@@ -77,50 +80,52 @@
             src="../assets/edit_design.png"
             class="mx-2"
           />
-          </div>
-          
-          <slot></slot>
         </div>
-      </div>
 
-      <!--  -->
+        <slot></slot>
+      </div>
     </div>
+
+    <!--  -->
+  </div>
   <!-- </div> -->
 </template>
 <script>
-// import PostDetails from './postDetails.vue';
-
 export default {
   name: "postCard",
   data() {
     return {
-      postDetail: {
-        image_url: "b2.png",
-        postMaker: "Prateek Kumar",
-        postOrg: "Argusoft",
-        postTitle: "First Post",
-        postContent:
-          "Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of (The Extremes of Good and Evil) by Cicero, written in 45 BC. This book is a treatise on the theory of ethics, very popular during the Renaissance. The first line of Lorem Ipsum, Lorem ipsum dolor sit amet.., comes from a line in section 1.10.32.The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for those interested. Sections 1.10.32 and 1.10.33 from by Cicero are also reproduced in their exact original form, accompanied by English versions from the 1914 translation by H. Rackham.",
-        likeCount: 505,
-        commentCount: 89,
-      },
       likeAmount: 0,
       editContent: false,
-      content: "",
-      title: "",
+
       liked: false,
+      imgPath: "",
+      details: this.postDetail,
+      description: "",
+      title: "",
     };
   },
+  props: {
+    postDetail: Object,
+  },
+
   methods: {
     image(url) {
-      const path = require(`../assets/${url}`);
-      return path;
+      console.log("url => ", url);
+      try {
+        console.log("No error here");
+        const path = require(`../assets/${url}`);
+        console.log("path => ", path);
+        return path;
+      } catch (error) {
+        console.log("Error caught");
+      }
     },
     toggleLike() {
       if (!this.liked) {
-        this.likeAmount++;
+        this.details.likeCount++;
       } else {
-        this.likeAmount--;
+        this.details.likeCount--;
       }
       // update like values in database
       this.liked = !this.liked;
@@ -128,6 +133,8 @@ export default {
 
     enableEdit() {
       this.editContent = true;
+      this.title = this.details.title;
+      this.description = this.details.description;
       setTimeout(() => {
         this.adaptHeight();
         this.$refs.editBox.focus();
@@ -139,13 +146,17 @@ export default {
         if (fromLoc == "textarea") {
           if (this.$refs.editInput != document.activeElement) {
             this.editContent = false;
+            this.details.title = this.title;
+            this.details.description = this.description;
             // api to update the changes to the database
-          } 
+          }
         } else {
           if (this.$refs.editBox != document.activeElement) {
             this.editContent = false;
+            this.details.title = this.title;
+            this.details.description = this.description;
             // api to update the changes to the database
-          } 
+          }
         }
       }, 1);
     },
@@ -155,10 +166,15 @@ export default {
       myTextarea.style.height = myTextarea.scrollHeight + "px";
     },
   },
-  mounted() {
-    this.likeAmount = this.postDetail.likeCount;
-    this.content = this.postDetail.postContent;
-    this.title = this.postDetail.postTitle;
+  beforeMount() {
+    // this.post = this.postDetail
+    console.log("1");
+    // this.likeAmount = this.details.likeCount;
+    // this.description = this.details.description;
+    // this.title = this.details.title;
+    console.log("2 before mount", this.postDetail);
+    console.log("3", this.likeAmount, this.description, this.title);
+    console.log("4", this.details);
   },
 };
 </script>
@@ -169,7 +185,6 @@ export default {
 }
 .postcard {
   border-radius: 25px;
-  /* padding: 10px 20px; */
 }
 .postHead {
   padding: 20px 20px 0px;
@@ -212,11 +227,11 @@ export default {
   /* color: red; */
   text-align: justify;
 }
-.actions{
+.actions {
   display: flex-end;
-  align-items: flex-end
+  align-items: flex-end;
 }
-.likeButton{
+.likeButton {
   display: flex;
   justify-content: baseline;
   font-weight: bold;
