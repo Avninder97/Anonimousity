@@ -41,7 +41,7 @@ const routes = [
     },
     {
         name: "orgProfile",
-        path: "/orgProfile/:orgId",
+        path: "/organization/:orgId",
         component: orgProfile
     }
 ]

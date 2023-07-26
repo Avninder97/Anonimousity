@@ -6,17 +6,42 @@ const inDev = process.env.INDEVMODE;
 
 const postControllers = {
 
-    // Fetches all the posts from the database
+    /*
+        Fetches all the posts from the database
+        Now supports query for organization and categories
+    */
     getPosts: async (req, res) => {
         try {
-            const posts = await Post.find({});
-            for(let i=0;i<posts.length;i++){
-                await posts[i].populate('author');
-                await posts[i].populate('organization');
+            const { organization, category } = req.query;
+            let foundPosts = [];
+            if(organization){
+                const foundOrganization = await Organization.findOne({ name: organization });
+                if(!foundOrganization){
+                    throw "Organization name not found";
+                }
+
+                if(category){
+                    console.log("here")
+                    foundPosts = await Post.find({ organization: foundOrganization._id, categories: { $in: [ category ]} });
+                }else{
+                    foundPosts = await Post.find({ organization: foundOrganization._id });
+                }
+                
+            }else if(category){
+                foundPosts = await Post.find({ categories: { $in: [ category ]} });
+            }else{
+                foundPosts = await Post.find({});
+            }
+            if(!foundPosts){
+                throw "Posts not found";
+            }
+            for(let i=0;i<foundPosts.length;i++){
+                await foundPosts[i].populate('author');
+                await foundPosts[i].populate('organization');
             }
             return res.status(200).json({
                 message: "Success",
-                posts: posts
+                posts: foundPosts
             });
         } catch(err) {
             inDev && console.log(err)
@@ -39,6 +64,7 @@ const postControllers = {
             await foundPost.populate('author');
             await foundPost.populate('comments');
             await foundPost.populate('likedBy');
+            await foundPost.populate('organization');
 
             for(let i=0;i<foundPost.comments.length;i++){
                 await foundPost.comments[i].populate('author');
