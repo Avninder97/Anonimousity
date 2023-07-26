@@ -12,7 +12,7 @@
       <div class="col-10 heading p-0">
         <h5>
           <span class="userName">{{ singlePost.author.username }} </span><br />
-          <span class="orgName">{{
+          <span class="orgName" @click="openOrg">{{
             singlePost.organization ? singlePost.organization.name : ""
           }}</span>
         </h5>
@@ -40,7 +40,11 @@
           class="editArea"
         />
       </div>
-      <div class="col-10" @click="this.$router.push({path: `/post/${singlePost._id}`})" v-else>
+      <div
+        class="col-10"
+        @click="this.$router.push({ path: `/post/${singlePost._id}` })"
+        v-else
+      >
         <p style="text-align: justify">
           <span class="postTitle">{{ title }} </span><br />
           <span class="postContent">{{ description }}</span>
@@ -230,6 +234,12 @@ export default {
       myTextarea.style.height = "auto";
       myTextarea.style.height = myTextarea.scrollHeight + "px";
     },
+    openOrg() {
+      this.$router.push({
+        name: "orgProfile",
+        params: { orgId: this.singlePost.organization._id },
+      });
+    },
     deletePost() {
       const url = `http://localhost:5000/api/posts/${this.currId}/delete`;
       const ourToken = this.$store.state.userToken;
@@ -309,6 +319,10 @@ export default {
 .orgName {
   font-size: medium;
   font-weight: normal;
+  cursor: pointer;
+}
+.orgName:hover{
+  text-decoration: underline;
 }
 .postTitle {
   font-size: large;

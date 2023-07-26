@@ -8,7 +8,9 @@
         <div class="col-10 heading">
           <h5>
             <span class="userName">{{ authorName }} </span><br />
-            <span class="orgName">{{ authorOrganization }}</span>
+            <span class="orgName" @click="openOrg()">{{
+              authorOrganization
+            }}</span>
           </h5>
         </div>
         <div class="col-1"></div>
@@ -108,7 +110,7 @@ export default {
     token: String,
     loggedInUserId: String,
   },
-  emits:["commentDeleted"],
+  emits: ["commentDeleted"],
 
   methods: {
     image(url) {
@@ -183,7 +185,7 @@ export default {
     },
     deleteComment() {
       // api call for deleting a comment
-      const commId = this.comment_data._id
+      const commId = this.comment_data._id;
       const postId = this.$route.params.postId;
       const url = `http://localhost:5000/api/posts/${postId}/comment/${this.comment_data._id}/delete`;
       const ourToken = this.$store.state.userToken;
@@ -202,11 +204,17 @@ export default {
         .then(() => {
           console.log("Comment deleted successfully");
           // emit the id back to the parent component to remove it from the array
-          this.$emit("commentDeleted", commId)
+          this.$emit("commentDeleted", commId);
         })
         .catch((err) => {
           console.log(err);
         });
+    },
+    openOrg() {
+      this.$router.push({
+        name: "orgProfile",
+        params: { orgId: this.comment_data.author.currentEmployeer._id },
+      });
     },
   },
 };
