@@ -43,6 +43,11 @@ const routes = [
         name: "orgProfile",
         path: "/organization/:orgId",
         component: orgProfile
+    },
+    {
+        name: 'pageNotFound',
+        // component: pageNotFound,
+        path: '/:pathMatch(.*)*'
     }
 ]
 
