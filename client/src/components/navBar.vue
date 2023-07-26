@@ -1,7 +1,7 @@
 <template>
   <nav class="navbar navbar-light ourNavbar fixed-top">
     <div class="container-fluid">
-      <span class="navbar-brand text-light" @click="openFeeds">Anonymousity</span>
+      <span class="navbar-brand appName text-light" @click="openFeeds">Anonymousity</span>
       <div>
         <div v-if="this.$store.state.loggedIn" class="mx-2 userOptions">
           <div class="addPost mx-3" @click="this.$router.push({name: 'addPost'})">+</div>
@@ -92,5 +92,8 @@ export default {
   color: inherit;
   font-weight: 1000;
   background-color: white;
+}
+.appName{
+  user-select: none;
 }
 </style>
