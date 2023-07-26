@@ -6,7 +6,7 @@
       style="border-bottom: 1px dotted rgb(240, 234, 234, 0.5)"
     >
       <div class="col-1">
-        <!-- <img :src="image(singlePost.author.profile_pic)" alt="Hello" /> -->
+        <img :src="image(singlePost.author.profile_pic)" alt="Hello" />
       </div>
 
       <div class="col-10 heading p-0">
@@ -124,15 +124,17 @@ export default {
   emits: ["postDeleted"],
   methods: {
     image(url) {
-      console.log("url => ", url);
-      try {
-        console.log("No error here");
-        const path = require(`../assets/${url}`);
-        console.log("path => ", path);
-        return path;
-      } catch (error) {
-        console.log("Error caught");
-      }
+      // console.log("url => ", url);
+      // try {
+      //   console.log("No error here");
+      //   const path = require(`../assets/${url}`);
+      //   console.log("path => ", path);
+      //   return path;
+      // } catch (error) {
+      //   console.log("Error caught");
+      // }
+      const path = require(`../assets/${url}`);
+      return path;
     },
 
     async toggleLike() {
@@ -273,8 +275,7 @@ export default {
   margin: 0 auto;
 }
 .postcard {
-  border-radius: 25px;
-  border: 2px solid red;
+  border-radius: 13px;
   margin: 2rem auto;
 }
 .postHead {

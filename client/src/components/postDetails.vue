@@ -8,7 +8,11 @@
     <h1>404 - Post Not Found</h1>
   </div>
   <div v-else class="postPage">
-    <postCard :singlePost="singlePost" class="sepForComms pb-3 mb-4" :uToken="token">
+    <postCard
+      :singlePost="singlePost"
+      class="sepForComms pb-3 mb-4"
+      :uToken="token"
+    >
       <div class="input-group addComments ms-2">
         <input
           type="text"
@@ -25,9 +29,28 @@
       </div>
     </postCard>
     <!-- Put a v-for loop for comments gathered from database -->
-    <div class="commentArea" v-if="singlePost.comments">
-      <commentCard v-for="(comment, index) in singlePost.comments" :key="index" :comment_data="comment" :token="token" :loggedInUserId="loggedInUserId"/>
+    <div v-if="!commentLoading">
+      <div class="commentArea py-2" v-if="singlePost.comments && singlePost.comments.length > 0">
+        <commentCard
+          v-for="(comment, index) in singlePost.comments"
+          :key="index"
+          :comment_data="comment"
+          :token="token"
+          :loggedInUserId="loggedInUserId"
+          @commentDeleted="(id) => commentDeleted(id)"
+        />
+      </div>
+      <div v-else class="postError">
+        <h1>No Comments</h1>
+      </div>
     </div>
+    <div v-else id="spinnerHolder">
+      <div class="spinner-border postLoader" role="status">
+        <span class="visually-hidden">Loading Comments...</span>
+      </div>
+    </div>
+
+    
   </div>
 </template>
 <script>
@@ -45,7 +68,8 @@ export default {
       token: "",
       loggedInUserId: "",
       loading: false,
-      error: false
+      error: false,
+      commentLoading: false
     };
   },
   components: {
@@ -55,30 +79,35 @@ export default {
   beforeMount() {
     this.loading = true;
     this.error = false;
-    try{
-      const cookiesArray = document.cookie.split(';');
+    try {
+      const cookiesArray = document.cookie.split(";");
       let ourToken = "";
       cookiesArray.map((cString) => {
-        if(cString.split('=')[0] === 'token'){
-          ourToken = cString.split('=')[1];
+        if (cString.split("=")[0] === "token") {
+          ourToken = cString.split("=")[1];
           ourToken.trim();
         }
       });
       this.token = ourToken;
-      let payload = ourToken.split('.')[1];
-      payload = payload.replace(/-/g, '+').replace(/_/g, '/');
-      payload = decodeURIComponent(window.atob(payload).split('').map(function(c) {
-        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-      }).join(''));
+      let payload = ourToken.split(".")[1];
+      payload = payload.replace(/-/g, "+").replace(/_/g, "/");
+      payload = decodeURIComponent(
+        window
+          .atob(payload)
+          .split("")
+          .map(function (c) {
+            return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
+          })
+          .join("")
+      );
       payload = JSON.parse(payload);
       this.loggedInUserId = payload.userId;
-    } catch(err) {
+    } catch (err) {
       console.log(err);
     }
 
-
     // get post id from parameter using this.$route.params.postId
-    console.log("Before Mount")
+    console.log("Before Mount");
     console.log(this.$route.params.postId);
     if (this.$route.params.postId) {
       this.postId = this.$route.params.postId;
@@ -96,7 +125,7 @@ export default {
           this.loading = false;
           this.error = true;
         });
-    }else{
+    } else {
       this.loading = false;
       this.error = true;
     }
@@ -107,20 +136,25 @@ export default {
         const arrow = this.$refs.commentArrow;
         arrow.style.color = "green";
 
-        axios.post(`http://localhost:5000/api/posts/${this.postId}/comment/new`, {
-          description: this.newComment.trim()
-        }, {
-          headers: {
-            Authorization: `Bearer ${this.token}`
-          }
-        })
-        .then((response) => {
-          console.log(response);
-          this.singlePost.comments.push(response?.data?.newComment);
-        })
-        .catch((err) => {
-          console.log(err);
-        })
+        axios
+          .post(
+            `http://localhost:5000/api/posts/${this.postId}/comment/new`,
+            {
+              description: this.newComment.trim(),
+            },
+            {
+              headers: {
+                Authorization: `Bearer ${this.token}`,
+              },
+            }
+          )
+          .then((response) => {
+            console.log(response);
+            this.singlePost.comments.push(response?.data?.newComment);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
 
         setTimeout(() => {
           arrow.style.color = "rgb(240, 234, 234)";
@@ -129,6 +163,11 @@ export default {
         this.newComment = "";
       }
     },
+    async commentDeleted(id){
+      this.commentLoading = true;
+      this.singlePost.comments = await this.singlePost.comments.filter(t => t._id !== id)
+      this.commentLoading = false;
+    }
   },
 };
 </script>
@@ -151,12 +190,16 @@ export default {
 .inputControl,
 .input-group-text {
   height: 30px;
+  /* width: 100%; */
   border: none;
   border-bottom: 1px solid rgb(240, 234, 234);
   outline: none;
   border-radius: 0;
   color: rgb(240, 234, 234);
   background-color: rgb(66, 66, 66);
+}
+.inputControl{
+  width: 92%;
 }
 .inputControl::placeholder {
   color: rgb(240, 234, 234);
@@ -192,8 +235,9 @@ export default {
   align-items: center;
 }
 
-/* .postPage .commentArea{
-  overflow: auto;
-  height: 400px;
-} */
+.postPage .commentArea{
+  background-color: rgb(66,66,66);
+  border-radius: 13px;
+  overflow: hidden;
+}
 </style>
