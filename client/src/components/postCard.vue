@@ -40,7 +40,7 @@
           class="editArea"
         />
       </div>
-      <div class="col-10" v-else>
+      <div class="col-10" @click="this.$router.push({path: `/post/${singlePost._id}`})" v-else>
         <p style="text-align: justify">
           <span class="postTitle">{{ title }} </span><br />
           <span class="postContent">{{ description }}</span>

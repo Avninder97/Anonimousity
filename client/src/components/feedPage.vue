@@ -1,9 +1,5 @@
 <template>
-  <div class="feedBody pt-4">
-      <!-- <div class="input-group addComments ms-2">
-        <input type="text" placeholder="Add a Comment" class="inputControl" v-model="newComment"/>
-        <span @click="addComment" class="input-group-text arrow" ref="commentArrow">>></span>
-      </div> -->
+  <div class="feedBody pt-1">
     <div v-if="loading" id="spinnerHolder">
       <div class="spinner-border postLoader" role="status">
         <span class="visually-hidden">Loading...</span>
@@ -17,7 +13,7 @@
           v-for="(post, index) in posts"
           :key="index"
           :singlePost="post"
-          class="py-3 my-4"
+          class="pb-3 pt-2 my-4"
         />
       </div>
 
