@@ -245,9 +245,6 @@ export default {
         )
         .then((response) => {
           console.log("message:", response.data.message);
-          // Write an if condition for the component call from postDetails page
-          // If yes use this.$router.back()
-          // else condition written below
           if (this.fromPage) {
             this.$router.push({ name: "feedPage" });
           } else {
