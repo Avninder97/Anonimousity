@@ -318,11 +318,14 @@ export default {
           break;
       }
     },
-    postDeleted(id) {
+    async postDeleted(id) {
+      let prevShow = this.show;
       console.log("Profile page changing userCreatedpost", id);
-      this.userCreatedPosts = this.userCreatedPosts.filter((t) => t._id !== id);
-      this.userLikedPosts = this.userLikedPosts.filter((t) => t._id !== id);
+      this.show = 'loading';
+      this.userCreatedPosts = await this.userCreatedPosts.filter((t) => t._id !== id);
+      this.userLikedPosts = await this.userLikedPosts.filter((t) => t._id !== id);
       console.log(this.userCreatedPosts);
+      this.show = prevShow;
     },
   },
 };

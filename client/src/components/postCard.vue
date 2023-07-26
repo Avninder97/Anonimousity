@@ -260,7 +260,7 @@ export default {
         });
     },
   },
-  updated() {
+  mounted() {
     this.likeAmount = this.singlePost.likedBy.length;
     this.description = this.singlePost.description;
     this.title = this.singlePost.title;
