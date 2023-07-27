@@ -84,7 +84,7 @@
       />
 
       <!-- Following page -->
-      <div v-if="show === 'following'">
+      <div v-if="show === 'following'" style="margin-top: 4rem;">
         <followingComp
           v-for="(organization, index) in userFollowing"
           :key="index"
@@ -92,6 +92,7 @@
           :currentUserId="loggedInUserId"
           :uToken="token"
           :handleUpdate="fetchFollowing"
+          class="mb-4"
         />
       </div>
 
