@@ -154,6 +154,9 @@ export default {
           })
           .catch((err) => {
             console.log(err);
+            if(err?.response?.data?.message === "Account Not Verified"){
+              this.$router.push('/notice')
+            }
           });
 
         setTimeout(() => {

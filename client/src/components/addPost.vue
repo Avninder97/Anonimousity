@@ -2,7 +2,7 @@
   <div class="container newPost">
     <div class="form">
       <h2 class="my-3">Add new Post</h2>
-      <h6 v-if="showWarning" class="warning">*All fields are necessary</h6>
+      <h6 v-if="showWarning" class="warning">{{ warning }}</h6>
       <input
         type="text"
         placeholder="Add title of your post"
@@ -33,15 +33,18 @@ export default {
         title: "",
         description: "",
       },
-      showWarning: false
+      showWarning: false,
+      warning: ''
     };
   },
   methods: {
     addPost() {
+      this.showWarning = false;
       if(!this.newPost.title || !this.newPost.description){
         this.showWarning = true
+        this.warning = "*All fields are necessary"
         console.log("All fields are necessary")
-        return
+        return;
       }
       const url = `http://localhost:5000/api/posts/new`;
       const ourToken = this.$store.state.userToken;
@@ -59,7 +62,13 @@ export default {
           
         })
         .catch((err) => {
-          console.log("Error \n",err);
+          this.showWarning = true;
+          if(err?.response?.data?.message === "Account Not Verified"){
+            this.warning = "Account Not Verified"
+          }else{
+            this.warning = "An Error Occured"
+          }
+          // console.log("Error \n",err);
         });
     },
   },

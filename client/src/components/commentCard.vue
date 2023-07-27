@@ -138,6 +138,9 @@ export default {
         .catch((err) => {
           console.log(err);
           this.liked = !this.liked;
+          if(err?.response?.data?.message === "Account Not Verified"){
+            this.$router.push('/notice')
+          }
         });
       // update like values in database
     },
@@ -174,7 +177,9 @@ export default {
         })
         .catch((err) => {
           console.log(err);
-          this.liked = !this.liked;
+          if(err?.response?.data?.message === "Account Not Verified"){
+            this.$router.push('/notice')
+          }
         });
       // api to update comment in database
     },
@@ -208,6 +213,9 @@ export default {
         })
         .catch((err) => {
           console.log(err);
+          if(err?.response?.data?.message === "Account Not Verified"){
+            this.$router.push('/notice')
+          }
         });
     },
     openOrg() {

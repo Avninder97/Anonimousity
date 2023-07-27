@@ -7,10 +7,14 @@ router
     .route('/')
     .get(authMiddlewares.validate, orgControllers.getOrganizations);
 
-// Might make it admin only route
+router
+    .route('/names')
+    .get(orgControllers.getOrganizationsNames)
+
+// Admin only route (To be secured)
 router
     .route('/new')
-    .post(authMiddlewares.validate, orgControllers.addOrganization);
+    .post(authMiddlewares.validate, authMiddlewares.isVerified, orgControllers.addOrganization);
 
 // Fetch a single organization from the DB
 router
@@ -20,6 +24,6 @@ router
 // Let's user follow an organization
 router
     .route('/:id/follow')
-    .post(authMiddlewares.validate, orgControllers.toggleFollowOrganization);
+    .post(authMiddlewares.validate, authMiddlewares.isVerified, orgControllers.toggleFollowOrganization);
 
 module.exports = router;

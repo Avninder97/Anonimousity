@@ -4,14 +4,12 @@ const inDev = process.env.INDEVMODE;
 
 module.exports.validate = async (req, res, next) => {
     try {
-        // console.log(req.headers);
         const auth_header = req.headers.authorization;
         if(!auth_header){
             return res.status(401).json({
                 message: 'Unauthorized request'
             });
         }
-        // console.log(auth_header)
         const token = auth_header.split(' ')[1];
         const decoded = await jwt.verify(token, process.env.SECRET_KEY);
         req.body.decoded = decoded;
@@ -31,6 +29,22 @@ module.exports.validate = async (req, res, next) => {
         console.log(err);
         return res.status(403).json({
             message: 'Invalid token'
+        })
+    }
+}
+
+module.exports.isVerified = async (req, res, next) => {
+    try {
+        const jwtToken = req.body?.decoded;
+        console.log(jwtToken);
+        if(!jwtToken || !(jwtToken.isVerified)){
+            throw "Error"
+        }
+        next();
+    }catch(err) {
+        console.log(err);
+        return res.status(403).json({
+            message: 'Account Not Verified'
         })
     }
 }

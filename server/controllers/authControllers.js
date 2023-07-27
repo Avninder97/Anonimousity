@@ -28,9 +28,14 @@ const authControllers = {
                         message: "User doesn't exist"
                     })
                 }else{
+                    if(!foundUser.isActive){
+                        return res.status(403).json({
+                            message: "Kindly verify your account via the recieved email"
+                        });
+                    }
                     const match = await bcrypt.compare(password, foundUser.password);
                     if(match){
-                        const token = generateToken(foundUser._id, foundUser.username, foundUser.role, foundUser.profile_pic);
+                        const token = generateToken(foundUser._id, foundUser.username, foundUser.role, foundUser.profile_pic, foundUser.isVerified);
                         res.cookie('user', token);
                         return res.status(200).json({
                             message: "User Logged In",

@@ -18,6 +18,30 @@ const orgControllers = {
             });
         }
     },
+
+    getOrganizationsNames: async (req, res) => {
+        try {
+            const foundOrganizations = await Organization.find({});
+            if(!foundOrganizations){
+                return res.status(404).json({
+                    message: "Organizations not found"
+                })
+            }
+            for(let i=0;i<foundOrganizations.length;i++){
+                foundOrganizations[i] = foundOrganizations[i].name;
+            }
+            console.log(foundOrganizations);
+            return res.status(200).json({
+                message: "Success",
+                names: foundOrganizations
+            })
+        } catch(err) {
+            inDev && console.log(err);
+            return res.status(500).json({
+                message: "Server Error"
+            })
+        }
+    },
     
     // fetch a single organization from db
     getSingleOrganization: async (req, res) => {

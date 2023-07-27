@@ -123,6 +123,7 @@ export default {
       prevTitle: "",
       prevDesc: "",
       currId: this.singlePost._id,
+      token: this.uToken ? this.uToken : this.$store.state.userToken
     };
   },
   emits: ["postDeleted"],
@@ -149,7 +150,7 @@ export default {
           {},
           {
             headers: {
-              Authorization: `Bearer ${this.uToken}`,
+              Authorization: `Bearer ${this.token}`,
             },
           }
         )
@@ -163,6 +164,9 @@ export default {
         })
         .catch((err) => {
           console.log(err);
+          if(err?.response?.data?.message === "Account Not Verified"){
+            this.$router.push('/notice')
+          }
           this.liked = !this.liked;
         });
     },
@@ -176,8 +180,6 @@ export default {
       }, 0.5);
     },
     editPostAPI() {
-      this.prevTitle = this.title;
-      this.prevDesc = this.description;
       const url = `http://localhost:5000/api/posts/${this.singlePost._id}/edit`;
       const ourToken = this.$store.state.userToken;
       axios
@@ -196,9 +198,16 @@ export default {
         )
         .then((response) => {
           console.log("message:", response.data.message);
+          this.prevTitle = this.title;
+          this.prevDesc = this.description;
         })
         .catch((err) => {
           console.log("Error \n", err);
+          this.title = this.prevTitle;
+          this.description = this.prevDesc;
+          if(err?.response?.data?.message === "Account Not Verified"){
+            this.$router.push('/notice')
+          }
         });
     },
 
@@ -266,6 +275,9 @@ export default {
         })
         .catch((err) => {
           console.log("Error \n", err);
+          if(err?.response?.data?.message === "Account Not Verified"){
+            this.$router.push('/notice');
+          }
         });
     },
   },

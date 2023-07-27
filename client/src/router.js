@@ -6,6 +6,7 @@ import loginPage from "./components/loginPage";
 import accountActivation from './components/accountActivation'
 import addPost from './components/addPost.vue'
 import orgProfile from './components/orgProfile.vue'
+import noticeComponent from './components/notice.vue'
 
 
 const routes = [
@@ -43,6 +44,11 @@ const routes = [
         name: "orgProfile",
         path: "/organization/:orgId",
         component: orgProfile
+    },
+    {
+        name: "notice",
+        path: "/notice",
+        component: noticeComponent
     }
 ]
 
