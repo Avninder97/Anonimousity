@@ -85,12 +85,12 @@
 
       <!-- Following page -->
       <div v-if="show === 'following'">
-        <followingComp 
-          v-for="(organization, index) in userFollowing" 
-          :key="index" 
-          :singleOrganization="organization" 
-          :currentUserId="loggedInUserId" 
-          :uToken="token" 
+        <followingComp
+          v-for="(organization, index) in userFollowing"
+          :key="index"
+          :singleOrganization="organization"
+          :currentUserId="loggedInUserId"
+          :uToken="token"
           :handleUpdate="fetchFollowing"
         />
       </div>
@@ -132,6 +132,7 @@ import postCard from "./postCard.vue";
 import changeAvatar from "./changeAvatar.vue";
 import privateKey from "./privateKey.vue";
 import followingComp from "./followingComp";
+import authenticate from "../authenticate.js";
 
 export default {
   name: "profilePage",
@@ -152,7 +153,7 @@ export default {
       userFollowing: [],
     };
   },
-
+  mixins: [authenticate],
   components: {
     postCard,
     myInfoProfile,
@@ -321,9 +322,13 @@ export default {
     async postDeleted(id) {
       let prevShow = this.show;
       console.log("Profile page changing userCreatedpost", id);
-      this.show = 'loading';
-      this.userCreatedPosts = await this.userCreatedPosts.filter((t) => t._id !== id);
-      this.userLikedPosts = await this.userLikedPosts.filter((t) => t._id !== id);
+      this.show = "loading";
+      this.userCreatedPosts = await this.userCreatedPosts.filter(
+        (t) => t._id !== id
+      );
+      this.userLikedPosts = await this.userLikedPosts.filter(
+        (t) => t._id !== id
+      );
       console.log(this.userCreatedPosts);
       this.show = prevShow;
     },
@@ -412,7 +417,6 @@ export default {
   width: 100px;
   height: 100px;
   align-self: center;
-  /* margin: auto; */
 }
 
 #spinnerHolder {
@@ -422,7 +426,5 @@ export default {
   justify-content: space-around;
   align-content: center;
   height: 80%;
-  /* border: 2px white solid; */
-  /* height: 100%; */
 }
 </style>

@@ -7,6 +7,7 @@ import accountActivation from './components/accountActivation'
 import addPost from './components/addPost.vue'
 import orgProfile from './components/orgProfile.vue'
 import noticeComponent from './components/notice.vue'
+import pageNotFound from './components/pageNotFound.vue'
 
 
 const routes = [
@@ -52,7 +53,7 @@ const routes = [
     },
     {
         name: 'pageNotFound',
-        // component: pageNotFound,
+        component: pageNotFound,
         path: '/:pathMatch(.*)*'
     }
 ]
