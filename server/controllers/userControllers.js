@@ -2,6 +2,7 @@ const Organization = require('../models/Organization');
 const User = require('../models/User');
 const uuid = require('uuid');
 const bcrypt = require('bcrypt');
+const { generateToken } = require('../utils/auth');
 let inDev = process.env.INDEVMODE;
 
 const userControllers = {
@@ -201,6 +202,44 @@ const userControllers = {
 
         } catch(err) {
             inDev && console.log(err);
+            return res.status(500).json({
+                message: "Server Error"
+            })
+        }
+    },
+
+    // Need to regenrate jwt auth token as it houses the profile_pic for frontend
+    updateAvatar: async (req, res) => {
+        try {
+            const userId = req.body.decoded.userId, { profile_pic } = req.body;
+    
+            const foundUser = await User.findOne({ _id: userId });
+
+            if(!foundUser){
+                return res.status(404).json({
+                    message: "User not found"
+                });
+            }
+
+            foundUser.profile_pic = profile_pic;
+            await foundUser.save();
+
+            const token = await generateToken(
+                foundUser._id,
+                foundUser.username,
+                foundUser.role,
+                foundUser.profile_pic,
+                foundUser.isVerified
+            );
+
+            res.cookie('user', token);
+
+            return res.status(200).json({
+                message: "Avatar Updated Successfully",
+                token
+            });
+        } catch (err) {
+            console.log(err);
             return res.status(500).json({
                 message: "Server Error"
             })

@@ -3,7 +3,7 @@
     <div class="selected">
       <img :src="image(profile_pic)" alt="" />
       <img
-        v-show="profile_pic !== 'default.png'"
+        v-if="profile_pic !== 'default.png'"
         :src="image('delete.png')"
         @click="changeAvatar('default.png')"
       />
@@ -37,19 +37,31 @@
       >
         Update
       </button>
+      <div class="message">
+        <p>{{ message }}</p>
+      </div>
     </div>
   </div>
 </template>
 <script>
+import axios from 'axios';
 export default {
   name: "changeAvatar",
   data() {
     return {
-      profile_pic: "b1.png",
+      profile_pic: "",
+      prev_pic: "",
+      showMsg: false,
+      message: ""
     };
   },
   emits: ["back"],
-
+  beforeMount(){
+    if(this.$store.state.user){
+      this.profile_pic = this.$store.state.user?.profile_pic ? this.$store.state.user.profile_pic : "default.png";
+      this.prev_pic = this.$store.state.user?.profile_pic ? this.$store.state.user.profile_pic : "default.png";
+    }
+  },
   methods: {
     image(url) {
       const path = require(`../assets/${url}`);
@@ -63,6 +75,28 @@ export default {
     },
     updateChange() {
       // api to update avatar in database
+      this.showMsg = false;
+      axios.post('http://localhost:5000/api/users/profile/updateAvatar', {
+        profile_pic: this.profile_pic
+      }, {
+        headers: {
+          Authorization: `Bearer ${this.$store.state.userToken}`
+        }
+      })
+      .then((response) => {
+        // console.log(response);
+        this.prev_pic = this.profile_pic;
+        this.message = "Avatar Updated Successfully"
+        // console.log({ ...this.$store.state.user, profile_pic: this.profile_pic });
+        this.$store.commit('updateUser', { ...this.$store.state.user, profile_pic: this.profile_pic });
+        document.cookie = `token=${response.data.token}`
+      })
+      .catch((err) => {
+        console.log(err);
+        this.profile_pic = this.prev_pic;
+        this.message = "An Error Occured"
+      })
+      this.showMsg = true;
       // send user back to my-info page after succesful updation using this.$emit('back')
     },
   },
@@ -134,5 +168,10 @@ export default {
 }
 .changeAvatars .options img {
   max-width: 125px;
+}
+.message {
+  position: absolute;
+  bottom: 0px;
+  right: 290px;
 }
 </style>
