@@ -1,22 +1,8 @@
 <template>
   <div class="feedBody pt-1">
-    <div class="filter_sorts">
-      <div class="filter">
-        <p>Filter by organization:</p>
-        <select class="form-select">
-          <option value="No Filter" selected>Default</option>
-          <option value="argusoft">Argusoft</option>
-        </select>
-      </div>
-      <div class="sort">
-        <p>Sort:</p>
-        <select class="form-select">
-          <option value="" selected>Default</option>
-          <option value="">Like Count</option>
-          <option value="">Date Created</option>
-        </select>
-      </div>
-    </div>
+
+    <feedDropdown @toBeFilteredBy="(orgName) => filterPosts(orgName)" @toBeSortedBy="(orderBy) => sortPosts(orderBy)"/>
+
     <div v-if="loading" id="spinnerHolder">
       <div class="spinner-border postLoader" role="status">
         <span class="visually-hidden">Loading...</span>
@@ -27,7 +13,7 @@
     </div>
     <div v-else>
       <postCard
-        v-for="(post, index) in posts"
+        v-for="(post, index) in filteredAndSortedPosts"
         :key="index"
         :singlePost="post"
         class="pb-3 pt-2 my-4"
@@ -37,6 +23,7 @@
 </template>
 <script>
 import postCard from "./postCard.vue";
+import feedDropdown from "./feedDropdowns.vue";
 import axios from "axios";
 export default {
   data() {
@@ -45,10 +32,12 @@ export default {
       loading: false,
       error: false,
       organization: [],
+      filteredAndSortedPosts: []
     };
   },
   components: {
     postCard,
+    feedDropdown
   },
   beforeMount() {
     this.loading = true;
@@ -58,16 +47,66 @@ export default {
       .then((response) => {
         console.log(response.data.posts);
         this.posts = response?.data?.posts ? response.data.posts : [];
+        this.filteredAndSortedPosts = response?.data?.posts ? response.data.posts : [];
         this.loading = false;
       })
       .catch((err) => {
         console.log(err);
         this.posts = [];
+        this.filteredAndSortedPosts = [];
         this.loading = false;
         this.error = true;
       });
   },
   methods: {
+    async filterPosts(orgName){
+      this.loading = true;
+      this.error = false;
+      try {
+        if(orgName){
+          const temp = await axios.get(`http://localhost:5000/api/posts?organization=${orgName}`);
+          if(temp?.data?.posts?.length){
+            this.filteredAndSortedPosts = temp?.data?.posts;
+          }else{
+            throw "post error";
+          }
+        }else{
+          this.filteredAndSortedPosts = this.posts;
+        }
+      } catch (err) {
+        this.error = true;
+        this.filteredAndSortedPosts = this.posts;
+      }
+      this.loading = false;
+    },
+    async sortPosts(orderBy){
+      this.loading = true;
+      this.error = false;
+      try {
+        if(orderBy === 'mostLikes' || orderBy === 'leastLikes'){
+          await this.filteredAndSortedPosts.sort((a, b) => {
+            return a.likedBy?.length - b.likedBy?.length;
+          })
+          if(orderBy === 'mostLikes'){
+            await this.filteredAndSortedPosts.reverse();
+          }
+        }else{
+          await this.filteredAndSortedPosts.sort((a, b) => {
+            console.log("time -> ", a.updatedAt);
+            let aTime = new Date(a.updatedAt).getTime(), bTime = new Date(b.updatedAt).getTime();
+            return aTime - bTime;
+          })
+          if(orderBy === 'latest'){
+            await this.filteredAndSortedPosts.reverse();
+          }
+        }
+      } catch(err) {
+        console.log(err);
+        this.filteredAndSortedPosts = this.posts;
+      }
+      this.loading = false;
+      this.error = false;
+    },
     addComment() {
       if (this.newComment) {
         const arrow = this.$refs.commentArrow;
