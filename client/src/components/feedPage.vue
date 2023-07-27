@@ -1,7 +1,9 @@
 <template>
   <div class="feedBody pt-1">
-
-    <feedDropdown @toBeFilteredBy="(orgName) => filterPosts(orgName)" @toBeSortedBy="(orderBy) => sortPosts(orderBy)"/>
+    <feedDropdown
+      @toBeFilteredBy="(orgName) => filterPosts(orgName)"
+      @toBeSortedBy="(orderBy) => sortPosts(orderBy)"
+    />
 
     <div v-if="loading" id="spinnerHolder">
       <div class="spinner-border postLoader" role="status">
@@ -32,12 +34,12 @@ export default {
       loading: false,
       error: false,
       organization: [],
-      filteredAndSortedPosts: []
+      filteredAndSortedPosts: [],
     };
   },
   components: {
     postCard,
-    feedDropdown
+    feedDropdown,
   },
   beforeMount() {
     this.loading = true;
@@ -47,7 +49,9 @@ export default {
       .then((response) => {
         console.log(response.data.posts);
         this.posts = response?.data?.posts ? response.data.posts : [];
-        this.filteredAndSortedPosts = response?.data?.posts ? response.data.posts : [];
+        this.filteredAndSortedPosts = response?.data?.posts
+          ? response.data.posts
+          : [];
         this.loading = false;
       })
       .catch((err) => {
@@ -59,18 +63,20 @@ export default {
       });
   },
   methods: {
-    async filterPosts(orgName){
+    async filterPosts(orgName) {
       this.loading = true;
       this.error = false;
       try {
-        if(orgName){
-          const temp = await axios.get(`http://localhost:5000/api/posts?organization=${orgName}`);
-          if(temp?.data?.posts?.length){
+        if (orgName) {
+          const temp = await axios.get(
+            `http://localhost:5000/api/posts?organization=${orgName}`
+          );
+          if (temp?.data?.posts?.length) {
             this.filteredAndSortedPosts = temp?.data?.posts;
-          }else{
+          } else {
             throw "post error";
           }
-        }else{
+        } else {
           this.filteredAndSortedPosts = this.posts;
         }
       } catch (err) {
@@ -79,28 +85,29 @@ export default {
       }
       this.loading = false;
     },
-    async sortPosts(orderBy){
+    async sortPosts(orderBy) {
       this.loading = true;
       this.error = false;
       try {
-        if(orderBy === 'mostLikes' || orderBy === 'leastLikes'){
+        if (orderBy === "mostLikes" || orderBy === "leastLikes") {
           await this.filteredAndSortedPosts.sort((a, b) => {
             return a.likedBy?.length - b.likedBy?.length;
-          })
-          if(orderBy === 'mostLikes'){
+          });
+          if (orderBy === "mostLikes") {
             await this.filteredAndSortedPosts.reverse();
           }
-        }else{
+        } else {
           await this.filteredAndSortedPosts.sort((a, b) => {
             console.log("time -> ", a.updatedAt);
-            let aTime = new Date(a.updatedAt).getTime(), bTime = new Date(b.updatedAt).getTime();
+            let aTime = new Date(a.updatedAt).getTime(),
+              bTime = new Date(b.updatedAt).getTime();
             return aTime - bTime;
-          })
-          if(orderBy === 'latest'){
+          });
+          if (orderBy === "latest") {
             await this.filteredAndSortedPosts.reverse();
           }
         }
-      } catch(err) {
+      } catch (err) {
         console.log(err);
         this.filteredAndSortedPosts = this.posts;
       }
@@ -146,14 +153,15 @@ export default {
   border-radius: 5px;
   border: 1px solid rgb(240, 234, 234, 0.1);
 }
-.filter_sorts .filter, .filter_sorts .sort{
+.filter_sorts .filter,
+.filter_sorts .sort {
   display: flex;
   flex-direction: column;
   justify-content: center;
   font-weight: bold;
   width: 100%;
 }
-.filter_sorts p{
+.filter_sorts p {
   margin-bottom: 0.2rem;
 }
 </style>
