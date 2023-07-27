@@ -260,7 +260,8 @@ export default {
       })
       .then(async (data) => {
         let token = data.data.token;
-        console.log(token);
+        // console.log(token);
+        // console.log(data.data)
         document.cookie = `token=${token}`;
         this.username = "";
         this.password = "";
@@ -278,7 +279,6 @@ export default {
           return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
         }).join(''));
         payload = JSON.parse(payload);
-        console.log(token);
         
         this.$store.commit('updateUser', payload);
         
