@@ -45,10 +45,17 @@ export default {
       }
     })
     .then(() => {
-      // console.log(response);
-      // console.log("Already Logged In");
       this.$store.commit('changeLoginStatus', true);
       this.$store.commit('updateToken', ourToken);
+
+      let payload = ourToken.split('.')[1];
+        payload = payload.replace(/-/g, '+').replace(/_/g, '/');
+        payload = decodeURIComponent(window.atob(payload).split('').map(function(c) {
+          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+        payload = JSON.parse(payload);
+        
+        this.$store.commit('updateUser', payload);
 
     })
     .catch(() => {

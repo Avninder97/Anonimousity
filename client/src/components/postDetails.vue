@@ -57,6 +57,7 @@
 import postCard from "./postCard.vue";
 import commentCard from "./commentCard.vue";
 import axios from "axios";
+import authenticate from "../authenticate.js";
 
 export default {
   name: "postDetails",
@@ -130,6 +131,7 @@ export default {
       this.error = true;
     }
   },
+  mixins: [authenticate],
   methods: {
     addComment() {
       if (this.newComment) {
