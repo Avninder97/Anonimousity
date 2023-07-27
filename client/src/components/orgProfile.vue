@@ -33,6 +33,8 @@
 </template>
 <script>
 import axios from 'axios';
+import authenticate from "../authenticate.js";
+
 export default {
   name: "orgProfile",
   data() {
@@ -49,6 +51,7 @@ export default {
       token: ''
     };
   },
+  mixins: [authenticate],
   async beforeMount() {
 
     this.loading = true;

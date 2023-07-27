@@ -85,6 +85,7 @@
 </template>
 <script>
 import axios from "axios";
+import authenticate from "../authenticate.js";
 
 export default {
   data() {
@@ -111,7 +112,7 @@ export default {
     loggedInUserId: String,
   },
   emits: ["commentDeleted"],
-
+  mixins: [authenticate],
   methods: {
     image(url) {
       const path = require(`../assets/${url}`);

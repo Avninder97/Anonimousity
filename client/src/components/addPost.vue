@@ -24,6 +24,7 @@
 </template>
 <script>
 import axios from "axios";
+import authenticate from "../authenticate.js";
 
 export default {
   name: "addPost",
@@ -37,6 +38,7 @@ export default {
       warning: ''
     };
   },
+  mixins: [authenticate],
   methods: {
     addPost() {
       this.showWarning = false;

@@ -5,21 +5,19 @@ const store = createStore({
         return{
             loggedIn: true,
             userToken: "",
-            user: null
+            user: null,
         }
     },
     mutations: {
         changeLoginStatus(state, newVal){
-            // console.log("isLoggedIn => ", newVal);
             state.loggedIn = newVal;
         },
         updateToken(state, newToken){
-            // console.log("setting userToken as => ", newToken);
             state.userToken = newToken;
         },
         updateUser(state, data){
             state.user = data;
-        }
+        },
     }
 })
 
