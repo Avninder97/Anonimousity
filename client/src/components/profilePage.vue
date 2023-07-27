@@ -3,7 +3,7 @@
     <div class="col-2 profile-navigation">
       <div class="profile_image">
         <img
-          :src="image('b2.png')"
+          :src="image(this.$store.state?.user?.profile_pic ? this.$store.state.user.profile_pic : 'default.png')"
           alt=""
           data-bs-toggle="dropdown"
           aria-expanded=""

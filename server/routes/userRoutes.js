@@ -7,6 +7,10 @@ router
     .route('/profile/updateEmployeer')
     .post(authMiddlewares.validate, userControllers.updateEmployeer);
 
+router
+    .route('/profile/updateAvatar')
+    .post(authMiddlewares.validate, userControllers.updateAvatar);
+
 // POST api to regenerate the private-key of a user
 router
     .route('/profile/regenerateKey')
