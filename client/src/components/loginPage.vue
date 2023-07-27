@@ -101,7 +101,7 @@
           v-model="signUpData.password"
         />
         <input
-          type="text"
+          type="password"
           placeholder="Retype Password"
           v-model="retyped_password"
           ref="retype_password"
@@ -260,8 +260,6 @@ export default {
       })
       .then(async (data) => {
         let token = data.data.token;
-        // console.log(token);
-        // console.log(data.data)
         document.cookie = `token=${token}`;
         this.username = "";
         this.password = "";
