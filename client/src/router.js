@@ -49,6 +49,11 @@ const routes = [
         name: "notice",
         path: "/notice",
         component: noticeComponent
+    },
+    {
+        name: 'pageNotFound',
+        // component: pageNotFound,
+        path: '/:pathMatch(.*)*'
     }
 ]
 
