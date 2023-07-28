@@ -63,7 +63,7 @@ const postControllers = {
             }
             await foundPost.populate('author');
             await foundPost.populate('comments');
-            await foundPost.populate('likedBy');
+            // await foundPost.populate('likedBy');
             await foundPost.populate('organization');
 
             for(let i=0;i<foundPost.comments.length;i++){

@@ -260,7 +260,7 @@ export default {
       })
       .then(async (data) => {
         let token = data.data.token;
-        document.cookie = `token=${token}`;
+        document.cookie = `token=${token};path=/`;
         this.username = "";
         this.password = "";
         this.loginError = false;

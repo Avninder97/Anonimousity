@@ -89,7 +89,7 @@ export default {
         this.message = "Avatar Updated Successfully"
         // console.log({ ...this.$store.state.user, profile_pic: this.profile_pic });
         this.$store.commit('updateUser', { ...this.$store.state.user, profile_pic: this.profile_pic });
-        document.cookie = `token=${response.data.token}`
+        document.cookie = `token=${response.data.token};path=/`
       })
       .catch((err) => {
         console.log(err);

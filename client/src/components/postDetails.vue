@@ -12,6 +12,7 @@
       :singlePost="singlePost"
       class="sepForComms pb-3 mb-4"
       :uToken="token"
+      :currentUserId="loggedInUserId"
     >
       <div class="input-group addComments ms-2">
         <input

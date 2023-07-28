@@ -119,11 +119,11 @@ export default {
       editContent: false,
       description: this.singlePost.description,
       title: this.singlePost.title,
-      liked: this.singlePost?.likedBy?.some((id) => id === this.currentUserId),
+      liked: this.singlePost.likedBy.some((id) => (id === this.currentUserId || id === this.$store.state?.user?.userId)),
       prevTitle: "",
       prevDesc: "",
       currId: this.singlePost._id,
-      token: this.uToken ? this.uToken : this.$store.state.userToken
+      token: this.$store.state?.userToken || this.uToken
     };
   },
   emits: ["postDeleted"],
@@ -144,6 +144,7 @@ export default {
 
     async toggleLike() {
       this.liked = !this.liked;
+      console.log(this.token)
       await axios
         .post(
           `http://localhost:5000/api/posts/${this.singlePost?._id}/like`,
@@ -288,6 +289,7 @@ export default {
     this.currId = this.singlePost._id;
     this.prevTitle = this.title;
     this.prevDesc = this.description;
+    this.liked = this.singlePost.likedBy.some((id) => (id === this.currentUserId || id === this.$store.state?.user?.userId));
   },
 };
 </script>
