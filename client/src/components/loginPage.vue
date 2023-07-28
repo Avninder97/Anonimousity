@@ -221,11 +221,11 @@ export default {
   },
   methods: {
     signUpForm() {
-      console.log(this.$refs.container.classList)
+      // console.log(this.$refs.container.classList)
       this.$refs.container.classList.add("right-panel-active");
     },
     signInForm() {
-      console.log(this.$refs.container.classList)
+      // console.log(this.$refs.container.classList)
       this.$refs.container.classList.remove("right-panel-active");
     },
     selectAvatar() {
@@ -255,7 +255,7 @@ export default {
     async signInSubmit() {
       // api for sign in using this.username this.password
       await axios.post('http://localhost:5000/api/auth/login', {
-        username: this.username,
+        username: this.username.trim(),
         password: this.password
       })
       .then(async (data) => {
@@ -329,8 +329,8 @@ export default {
     },
     async signUpSubmit() {
       // Calls api for user registration
-      const { username, email, password, gender, profile_pic } = this.signUpData;
-
+      const { email, password, gender, profile_pic } = this.signUpData;
+      const username = this.signUpData.username.trim()
       // required fields
       if(username && email && password){
         await axios.post('http://localhost:5000/api/auth/register', {
@@ -365,7 +365,7 @@ export default {
         this.showUsernameMsg = false;
       }else{
         await axios.post('http://localhost:5000/api/auth/usernameCheck', {
-          username: this.signUpData.username
+          username: this.signUpData.username.trim()
         }).then((response) => {
           console.log(response);
           this.$refs.registerUsername.style.outline = "1px solid green";
